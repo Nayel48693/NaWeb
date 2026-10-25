@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Pet Amigo | Demo NaWeb</title>
+  <meta name="description" content="Demonstração fictícia de uma loja de animais criada pela NaWeb.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/demos.css">
+</head>
+<body class="demo pet" data-demo="pet">
+  <div class="demo-bar">Isto é uma demo criada pela NaWeb. <a href="index.html#exemplos">← Voltar</a><a href="index.html#contacto">Quero um site assim</a></div>
+  <header class="demo-header"><div class="container demo-nav"><div class="demo-logo">PET AMIGO</div><button class="btn btn-primary btn-small pet-cart-button" type="button" data-cart-open aria-expanded="false" aria-controls="pet-cart">Carrinho <span data-cart-count>0</span></button></div></header>
+  <main>
+    <section class="demo-hero"><div class="container"><span class="eyebrow">Loja fictícia · Demo</span><h1>Mais cuidado,<br>mais momentos felizes.</h1><p>Uma seleção de produtos para cuidar de quem está sempre ao teu lado.</p><a class="btn btn-primary" href="#loja">Explorar a loja</a></div></section>
+    <section id="loja"><div class="container"><h2>Loja Pet Amigo</h2><div class="demo-filters" data-filter-group><button class="btn btn-secondary btn-small is-active" type="button" data-filter="todos" data-filter-target="#pet-products [data-product]">Todos</button><button class="btn btn-secondary btn-small" type="button" data-filter="caes" data-filter-target="#pet-products [data-product]">Cães</button><button class="btn btn-secondary btn-small" type="button" data-filter="gatos" data-filter-target="#pet-products [data-product]">Gatos</button><button class="btn btn-secondary btn-small" type="button" data-filter="alimentacao" data-filter-target="#pet-products [data-product]">Alimentação</button><button class="btn btn-secondary btn-small" type="button" data-filter="brinquedos" data-filter-target="#pet-products [data-product]">Brinquedos</button><button class="btn btn-secondary btn-small" type="button" data-filter="higiene" data-filter-target="#pet-products [data-product]">Higiene</button><button class="btn btn-secondary btn-small" type="button" data-filter="acessorios" data-filter-target="#pet-products [data-product]">Acessórios</button></div><div id="pet-products" class="demo-grid pet-grid"></div></div></section>
+    <section><div class="container"><h2>Visita-nos</h2><p>Rua das Patas, 12 · Loja fictícia</p><div class="demo-map" role="img" aria-label="Mapa ilustrativo, localização fictícia">Mapa ilustrativo · localização fictícia</div></div></section>
+  </main>
+  <footer class="demo-footer"><div class="container">Pet Amigo · Demo NaWeb · <a href="https://wa.me/351931893274">WhatsApp</a></div></footer>
+  <aside id="pet-cart" class="demo-cart-drawer" aria-label="Carrinho de compras" hidden><div class="cart-head"><h2>O teu carrinho</h2><button type="button" data-cart-close aria-label="Fechar carrinho">×</button></div><div data-cart-items></div><div class="cart-total"><strong>Total</strong><strong data-cart-total>0,00€</strong></div><button class="btn btn-primary" type="button" data-checkout>Finalizar</button><section class="cart-checkout" hidden><h3>Levantamento em loja</h3><p>Esta encomenda é apenas uma simulação.</p><form class="demo-form"><label>Nome<input name="name" autocomplete="name" required></label><label>Telefone<input type="tel" autocomplete="tel" required></label><button class="btn btn-primary" type="submit">Confirmar levantamento</button></form></section></aside>
+  <dialog id="product-modal" aria-label="Detalhes do produto"></dialog>
+  <script type="module" src="js/demos.js"></script>
+</body>
+</html>

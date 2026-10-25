@@ -1,4 +1,5 @@
+# TODO: trocar por https://naweb.com/ quando o domínio for comprado
 User-agent: *
 Allow: /
 Disallow: /admin.html
-Sitemap: https://exemplo.github.io/nayweb/sitemap.xml
+Sitemap: https://naweb.pages.dev/sitemap.xml

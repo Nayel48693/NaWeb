@@ -1,12 +1,11 @@
-// TODO: trocar quando tiver contactos do NayWeb.
+// TODO: trocar quando tiver os contactos definitivos da NaWeb.
 export const config = {
-  EMAIL: "anilanderm@gmail.com",
+  SITE_URL: "https://naweb.pages.dev/",
+  EMAIL: "nawebadmin@gmail.com",
+  FORMSPREE_ENDPOINT: "https://formspree.io/f/COLOCAR_ID_AQUI",
   WHATSAPP: "351931893274",
   TELEFONE: "+351 931 893 274",
   INSTAGRAM: "",
   FACEBOOK: "",
-  EMAILJS_SERVICE_ID: "service_x4ohv9l",
-  EMAILJS_TEMPLATE_ID: "template_10t9n6f",
-  EMAILJS_PUBLIC_KEY: "mPfqDU_9-ydWpf_Af",
   INTERVALO_MS: 3000
 };
