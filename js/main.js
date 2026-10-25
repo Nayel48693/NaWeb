@@ -29,7 +29,7 @@ async function loadRemote() {
 }
 function contactLinks() {
   const wa = `https://wa.me/${state.configuracoes.whatsapp}`;
-  $$("[data-whatsapp]").forEach((link) => { link.href = wa; }); $$("[data-email]").forEach((link) => { link.href = `mailto:${state.configuracoes.email}`; link.textContent = link.dataset.emailLabel || state.configuracoes.email; }); $$("[data-phone]").forEach((link) => { link.href = `tel:${state.configuracoes.telefone.replace(/\s/g, "")}`; link.textContent = state.configuracoes.telefone; });
+  $$("[data-whatsapp]").forEach((link) => { link.href = wa; }); $$("[data-email]").forEach((link) => { const email = state.configuracoes.email; link.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent("Pedido de orçamento NaWeb")}`; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = email; }); $$("[data-phone]").forEach((link) => { link.href = `tel:${state.configuracoes.telefone.replace(/\s/g, "")}`; link.textContent = state.configuracoes.telefone; });
   $$("[data-social]").forEach((link) => { const value = state.configuracoes[link.dataset.social]; if (value) link.href = value; else link.remove(); });
 }
 async function trackVisit() {
