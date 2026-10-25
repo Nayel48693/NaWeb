@@ -22,6 +22,10 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 
 Faz push deste conteúdo para um repositório GitHub e ativa Pages em **Settings > Pages**, escolhendo a branch e a pasta publicadas. Mantém os caminhos relativos para funcionar em subpastas.
 
+## Chatbot
+
+O assistente NaWeb funciona localmente no browser, sem backend, custos ou armazenamento do histórico. Usa os planos e as perguntas frequentes carregados pelo site; confirma por WhatsApp os detalhes ainda por definir.
+
 ## Checklist de testes
 
 - [ ] Rotador do hero e da barra, incluindo pausa e `prefers-reduced-motion`.
@@ -37,3 +41,4 @@ Faz push deste conteúdo para um repositório GitHub e ativa Pages em **Settings
 - [ ] Demos Café Aroma e Pulse Fit: filtros de menu/horários e submissão dos formulários simulados.
 - [ ] Demo Clínica Sorriso Claro: FAQ, serviços e pedido de marcação simulado.
 - [ ] Links de contacto, cookies essenciais e barra inferior.
+- [ ] Chatbot: abrir/fechar com o botão e Escape, foco acessível, respostas rápidas e texto, planos/FAQ carregados, ações de exemplos/orçamento/WhatsApp, sem persistência nem envio do texto e apresentação em desktop/mobile com `prefers-reduced-motion`.
