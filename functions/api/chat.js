@@ -4,12 +4,12 @@ const MAX_TOKENS = 300;
 const MAX_MESSAGES = 8;
 const MAX_CHARS = 500;
 const MAX_CONTEXT_CHARS = 2000;
-const ALLOWED_ORIGINS = [
-  "https://nawebs.com",
-  "https://www.nawebs.com",
-  "http://localhost",
-  "http://127.0.0.1"
-  // Se for preciso testar antes de o domínio estar ligado, acrescentar temporariamente https://nawebs.pages.dev.
+const ALLOWED_HOSTNAMES = [
+  "nawebs.com",
+  "www.nawebs.com",
+  "nayweb.pages.dev",
+  "nawebs.pages.dev"
+  // Remover os pages.dev quando o domínio nawebs.com estiver ligado e testado.
 ];
 
 const REGRAS_DO_ASSISTENTE = [
@@ -44,10 +44,12 @@ const isAllowedOrigin = (value) => {
   } catch (_) {
     return false;
   }
-  const origin = url.origin;
-  if (ALLOWED_ORIGINS.includes(origin)) return true;
-  if (url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1")) return true;
-  return false;
+  const hostname = url.hostname.toLowerCase();
+  if (url.protocol === "http:") return hostname === "localhost" || hostname === "127.0.0.1";
+  if (url.protocol !== "https:") return false;
+  return ALLOWED_HOSTNAMES.some((allowedHostname) => hostname === allowedHostname
+    || ((allowedHostname === "nayweb.pages.dev" || allowedHostname === "nawebs.pages.dev")
+      && hostname.endsWith(`.${allowedHostname}`)));
 };
 
 const isQuotaError = (error) => {
