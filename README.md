@@ -14,7 +14,7 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 4. Edita os contactos em `js/config.js` quando tiveres os dados definitivos e substitui `COLOCAR_ID_AQUI` em `FORMSPREE_ENDPOINT` pelo ID real do formulário Formspree. Os pedidos são enviados por email através do Formspree e também guardados no Firestore quando este está configurado.
 5. Cria o primeiro utilizador no Firebase Authentication e depois cria manualmente `admins/{UID}` no Firestore, com o campo `email`.
 6. Entra em `admin.html` e usa **Carregar dados iniciais** para preencher planos, exemplos, FAQ e `configuracoes/site`.
-7. O canonical, `robots.txt` e `sitemap.xml` usam temporariamente `https://naweb.pages.dev/`; troca para `https://naweb.com/` quando o domínio for comprado.
+7. O domínio público é `https://nawebs.com/`; confirma que canonical, `robots.txt` e `sitemap.xml` correspondem ao domínio publicado.
 8. Revê `privacidade.html`: é um modelo e precisa da identificação do responsável, prazos e detalhes legais reais.
 9. As sete demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma e Pulse Fit. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
 
@@ -24,7 +24,11 @@ Faz push deste conteúdo para um repositório GitHub e ativa Pages em **Settings
 
 ## Chatbot
 
-O assistente NaWeb funciona localmente no browser, sem backend, custos ou armazenamento do histórico. Usa os planos e as perguntas frequentes carregados pelo site; confirma por WhatsApp os detalhes ainda por definir.
+O chatbot usa uma arquitetura híbrida: as respostas por palavras-chave no browser são a primeira camada; quando nenhuma regra corresponde, a interface chama a Pages Function `functions/api/chat.js`, que envia o contexto atual do site e as últimas mensagens para o Workers AI. O histórico existe apenas em memória durante a visita e a NaWeb não guarda as conversas. Não há chave de API no código: a ligação é feita através do binding `AI` da Cloudflare.
+
+O Workers AI tem um limite gratuito de **10 000 neurons por dia**, sujeito aos limites e condições atuais da Cloudflare. Para ligar o binding, abre **Cloudflare Dashboard > Workers & Pages > naweb > Settings > Bindings > Add > Workers AI**, define o nome da variável como `AI`, guarda e faz um novo deploy.
+
+Para testar localmente as Pages Functions, usa `npx wrangler pages dev . --ai AI` (com o binding Workers AI disponível na conta). O Live Server não executa Pages Functions; nesse caso, as respostas por regras continuam disponíveis, mas não a camada de IA.
 
 ## Checklist de testes
 
@@ -41,4 +45,6 @@ O assistente NaWeb funciona localmente no browser, sem backend, custos ou armaze
 - [ ] Demos Café Aroma e Pulse Fit: filtros de menu/horários e submissão dos formulários simulados.
 - [ ] Demo Clínica Sorriso Claro: FAQ, serviços e pedido de marcação simulado.
 - [ ] Links de contacto, cookies essenciais e barra inferior.
-- [ ] Chatbot: abrir/fechar com o botão e Escape, foco acessível, respostas rápidas e texto, planos/FAQ carregados, ações de exemplos/orçamento/WhatsApp, sem persistência nem envio do texto e apresentação em desktop/mobile com `prefers-reduced-motion`.
+- [ ] Chatbot: testar respostas por regras, respostas de IA, fallback sem binding/com erro e limites de mensagens; confirmar que o histórico não persiste e que as mensagens são enviadas apenas à Pages Function.
+- [ ] Chatbot: abrir/fechar com botão e Escape, foco acessível, respostas rápidas, ações WhatsApp/orçamento/exemplos/preços e indicador de escrita.
+- [ ] Chatbot: arrastar com rato e toque, mover com setas e guardar/restaurar a posição; testar resize, orientação, limites do ecrã, desktop/mobile e `prefers-reduced-motion`.

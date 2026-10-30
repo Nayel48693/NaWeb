@@ -2,7 +2,7 @@
   position: fixed;
   z-index: 31;
   left: 18px;
-  bottom: 190px;
+  top: 0;
   width: 56px;
   height: 56px;
   display: grid;
@@ -12,16 +12,20 @@
   color: white;
   background: var(--blue);
   box-shadow: var(--shadow);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: none;
 }
+.naweb-chat-launcher.is-dragging { cursor: grabbing; transform: scale(1.05); }
 .naweb-chat-launcher svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .naweb-chat-panel {
   position: fixed;
   z-index: 36;
-  left: 18px;
-  bottom: 214px;
+  left: 8px;
+  top: 8px;
   width: min(390px, calc(100vw - 36px));
-  max-height: min(580px, calc(100dvh - 240px));
+  max-height: min(580px, calc(100dvh - 16px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -30,28 +34,44 @@
   color: var(--text);
   background: var(--surface-strong);
   box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 150ms ease, transform 150ms ease;
 }
+.naweb-chat-panel.is-open { opacity: 1; transform: translateY(0); }
 .naweb-chat-panel[hidden], .naweb-chat-launcher[hidden] { display: none; }
-.naweb-chat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; color: white; background: var(--gradient); }
-.naweb-chat-header h2 { margin: 0; font: 700 1rem "Space Grotesk", ui-sans-serif, sans-serif; }
-.naweb-chat-close { width: 36px; height: 36px; border: 0; border-radius: 50%; color: white; background: rgba(255,255,255,.16); font-size: 1.6rem; line-height: 1; cursor: pointer; }
-.naweb-chat-messages { display: flex; flex: 1; flex-direction: column; gap: 10px; min-height: 0; padding: 16px; overflow-y: auto; }
-.naweb-chat-message { width: fit-content; max-width: 92%; padding: 10px 13px; border-radius: 14px; color: var(--text); background: #f1f2f0; overflow-wrap: anywhere; font-size: .92rem; }
-.naweb-chat-message-user { align-self: flex-end; color: white; background: var(--blue); }
-.naweb-chat-message-bot { align-self: flex-start; }
-.naweb-chat-typing { color: var(--muted); font-style: italic; }
+.naweb-chat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; color: white; background: var(--gradient); }
+.naweb-chat-heading h2 { margin: 0; font: 700 1rem "Space Grotesk", ui-sans-serif, sans-serif; }
+.naweb-chat-heading p { margin: 3px 0 0; color: rgba(255,255,255,.82); font-size: .78rem; }
+.naweb-chat-header-actions { display: flex; align-items: center; gap: 8px; }
+.naweb-chat-new, .naweb-chat-close { min-height: 36px; border: 0; border-radius: 999px; color: white; background: rgba(255,255,255,.16); cursor: pointer; }
+.naweb-chat-new { padding: 7px 10px; font-size: .78rem; }
+.naweb-chat-close { width: 36px; padding: 0; border-radius: 50%; font-size: 1.6rem; line-height: 1; }
+.naweb-chat-note { margin: 0; padding: 7px 16px 0; color: var(--muted); font-size: .75rem; }
+.naweb-chat-messages { display: flex; flex: 1; flex-direction: column; gap: 8px; min-height: 0; padding: 16px; overflow-y: auto; overscroll-behavior: contain; }
+.naweb-chat-message { width: fit-content; max-width: 85%; padding: 10px 13px; border-radius: 14px; color: var(--text); background: #f1f2f0; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 15px; line-height: 1.45; }
+.naweb-chat-message-user { align-self: flex-end; border-bottom-right-radius: 4px; color: white; background: var(--blue); }
+.naweb-chat-message-bot { align-self: flex-start; border-bottom-left-radius: 4px; }
+.naweb-chat-typing { display: flex; align-items: center; gap: 5px; min-height: 38px; }
+.naweb-chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: naweb-chat-dot 1s ease-in-out infinite; }
+.naweb-chat-typing span:nth-child(2) { animation-delay: .15s; }
+.naweb-chat-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes naweb-chat-dot { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-4px); } }
 .naweb-chat-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .naweb-chat-action, .naweb-chat-quick-reply { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 7px 11px; border: 1px solid var(--blue); border-radius: 999px; color: var(--blue); background: white; font-size: .82rem; line-height: 1.3; text-align: center; text-decoration: none; cursor: pointer; }
-.naweb-chat-quick-replies { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 14px; }
-.naweb-chat-quick-replies[hidden] { display: none; }
-.naweb-chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: var(--surface-strong); }
-.naweb-chat-input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: white; }
+.naweb-chat-quick-replies { display: flex; flex: 0 0 auto; flex-wrap: nowrap; gap: 8px; padding: 0 12px 10px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.naweb-chat-quick-replies::-webkit-scrollbar { display: none; }
+.naweb-chat-quick-reply { flex: 0 0 auto; white-space: nowrap; }
+.naweb-chat-form { display: flex; flex: 0 0 auto; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: var(--surface-strong); }
+.naweb-chat-input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: white; font-size: 16px; }
 .naweb-chat-send { padding: 9px 14px; border: 0; border-radius: 10px; color: white; background: var(--blue); font-weight: 700; cursor: pointer; }
 .naweb-chat-send:disabled { opacity: .55; cursor: wait; }
+.naweb-chat-launcher:focus-visible, .naweb-chat-panel button:focus-visible, .naweb-chat-panel a:focus-visible, .naweb-chat-input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.naweb-chat-header button:focus-visible { outline-color: white; }
 @media (max-width: 700px) {
-  .naweb-chat-launcher { bottom: 230px; }
-  .naweb-chat-panel { left: 3vw; bottom: 12px; width: 94vw; max-height: calc(100dvh - 24px); }
+  .naweb-chat-panel { box-sizing: border-box; left: 3vw !important; top: auto !important; right: 3vw; bottom: 0; width: 94vw; height: 100dvh; max-height: none; padding-bottom: env(safe-area-inset-bottom); border-radius: var(--radius) var(--radius) 0 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .naweb-chat-launcher, .naweb-chat-panel, .naweb-chat-action, .naweb-chat-quick-reply { scroll-behavior: auto; transition: none; }
+  .naweb-chat-typing span { animation: none; }
 }
