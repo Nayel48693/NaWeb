@@ -1,5 +1,5 @@
 import { config } from "./config.js";
-import { defaults } from "./defaults.js";
+import { defaults, LOCAL_CARD_IMAGES } from "./defaults.js";
 import { db, collection, getDocs, doc, setDoc, increment } from "./firebase.js";
 import { createRotator } from "./rotator.js";
 import { guardarPedido } from "./pedidos.js";
@@ -41,7 +41,22 @@ async function trackVisit() {
     await setDoc(doc(db, "estatisticas", "visitas"), { total: increment(1) }, { merge: true });
   } catch (error) { console.warn("Não foi possível registar a visita.", error); }
 }
-function renderExamples(filter = "todos") { const root = $("#examples-grid"); if (!root) return; let items = state.exemplos.filter((item) => item.ativo !== false && (filter === "todos" || item.categoria === filter)); if (!items.length) items = defaults.exemplos.filter((item) => filter === "todos" || item.categoria === filter); root.innerHTML = items.map((item) => { const defaultExample = defaults.exemplos.find((example) => example.id === item.id || example.categoria === item.categoria); const image = item.imagem || item.imagemUrl || defaultExample?.imagem; const visual = image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy">` : (item.categoria === "barbearia" ? "✂" : item.categoria === "restaurante" ? "◌" : "✿"); return `<article class="card example-card reveal is-visible"><div class="example-visual"${image ? "" : " aria-hidden=\"true\""}>${visual}</div><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(item.descricao)}</p><div class="chips">${(item.tags || []).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div><a class="btn btn-secondary btn-small" href="${escapeHtml(item.demoUrl)}">Ver demo</a></article>`; }).join(""); }
+function renderExamples(filter = "todos") {
+  const root = $("#examples-grid");
+  if (!root) return;
+  let items = state.exemplos.filter((item) => item.ativo !== false && (filter === "todos" || item.categoria === filter));
+  if (!items.length) items = defaults.exemplos.filter((item) => filter === "todos" || item.categoria === filter);
+  root.innerHTML = items.map((item) => {
+    const defaultExample = defaults.exemplos.find((example) => example.id === item.id || example.categoria === item.categoria);
+    const localImage = Object.hasOwn(LOCAL_CARD_IMAGES, item.id) ? LOCAL_CARD_IMAGES[item.id] : null;
+    const image = localImage?.src || item.imagem || item.imagemUrl || defaultExample?.imagem;
+    const fallbackHandler = localImage?.fallback
+      ? ` onerror="this.onerror=null;this.src='${escapeHtml(localImage.fallback)}'"`
+      : "";
+    const visual = image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy"${fallbackHandler}>` : (item.categoria === "barbearia" ? "✂" : item.categoria === "restaurante" ? "◌" : "✿");
+    return `<article class="card example-card reveal is-visible"><div class="example-visual"${image ? "" : " aria-hidden=\"true\""}>${visual}</div><h3>${escapeHtml(item.titulo)}</h3><p>${escapeHtml(item.descricao)}</p><div class="chips">${(item.tags || []).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div><a class="btn btn-secondary btn-small" href="${escapeHtml(item.demoUrl)}">Ver demo</a></article>`;
+  }).join("");
+}
 const formatEuro = (value) => new Intl.NumberFormat("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value) || 0);
 function renderPlans() { const root = $("#plans-grid"); if (!root) return; let plans = state.planos.filter((item) => item.ativo !== false); if (!plans.length) plans = defaults.planos; root.innerHTML = plans.map((plan) => { const defaultPlan = defaults.planos.find((item) => item.id === plan.id || item.nome === plan.nome); const precoCriacao = plan.precoCriacao ?? defaultPlan?.precoCriacao; const features = (plan.funcionalidades || []).map((feature) => defaultPlan && /^\d+ alterações por mês$/i.test(feature) ? `${defaultPlan.alteracoesPorMes} alterações por mês` : feature); return `<article class="card plan-card ${plan.destaque ? "featured" : ""}">${plan.destaque ? '<span class="badge">Mais popular</span>' : ""}<h3>${escapeHtml(plan.nome)}</h3><p>${escapeHtml(plan.descricao)}</p>${precoCriacao ? `<div class="plan-setup">Criação do site: <strong>${formatEuro(precoCriacao)}€</strong></div>` : ""}<div class="plan-price">${formatEuro(plan.preco)}€<small>/${escapeHtml(plan.periodo)}</small></div><ul>${features.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul><button class="btn ${plan.destaque ? "btn-primary" : "btn-secondary"} choose-plan" data-plan="${escapeHtml(plan.nome)}">Escolher plano</button></article>`; }).join(""); $$(".choose-plan").forEach((button) => button.addEventListener("click", () => { $("#plano").value = button.dataset.plan; $("#contacto").scrollIntoView({ behavior: "smooth" }); })); }
 function renderFaq() { const root = $("#faq-list"); if (!root) return; let items = state.faq.filter((item) => item.ativo !== false); if (!items.length) items = defaults.faq; root.innerHTML = items.map((item) => `<div class="faq-item"><button aria-expanded="false">${escapeHtml(item.pergunta)}<span>+</span></button><div class="faq-answer"><p>${escapeHtml(item.resposta)}</p></div></div>`).join(""); $$(".faq-item button").forEach((button) => button.addEventListener("click", () => { const open = button.parentElement.classList.toggle("is-open"); button.setAttribute("aria-expanded", String(open)); button.querySelector("span").textContent = open ? "−" : "+"; })); }

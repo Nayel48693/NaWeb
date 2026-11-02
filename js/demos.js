@@ -46,15 +46,31 @@ const PRODUCTS = [
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character]));
 const euro = (value) => `${Number(value).toFixed(2).replace(".", ",")}€`;
+const fallbackImageListeners = new WeakSet();
 function fallbackImages() {
-  document.querySelectorAll(".demo img").forEach((image) => image.addEventListener("error", () => {
-    const fallback = document.createElement("div");
-    fallback.className = "demo-image-fallback";
-    fallback.setAttribute("role", "img");
-    fallback.setAttribute("aria-label", image.alt || "Imagem ilustrativa");
-    fallback.textContent = image.dataset.fallbackEmoji || "🌿";
-    image.replaceWith(fallback);
-  }, { once: true }));
+  document.querySelectorAll(".demo img").forEach((image) => {
+    if (fallbackImageListeners.has(image)) return;
+    fallbackImageListeners.add(image);
+    image.addEventListener("error", () => {
+      if (image.dataset.fallbackSrc && !image.dataset.fallbackAttempted) {
+        image.dataset.fallbackAttempted = "true";
+        image.src = image.dataset.fallbackSrc;
+        return;
+      }
+      if (image.hasAttribute("data-optional")) {
+        const gallery = image.closest(".demo-gallery");
+        image.remove();
+        if (gallery && !gallery.querySelector("img")) gallery.closest("section")?.remove();
+        return;
+      }
+      const fallback = document.createElement("div");
+      fallback.className = "demo-image-fallback";
+      fallback.setAttribute("role", "img");
+      fallback.setAttribute("aria-label", image.alt || "Imagem ilustrativa");
+      fallback.textContent = image.dataset.fallbackEmoji || "🌿";
+      image.replaceWith(fallback);
+    });
+  });
 }
 
 function notificationsAndPromotions() {

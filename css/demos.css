@@ -5,8 +5,12 @@ body.demo { min-width: 0; --demo-accent: #c49a54; --demo-surface: #242321; --dem
 .demo-nav { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 15px; min-width: 0; }
 .demo-logo { color: var(--demo-accent); font: 700 1.5rem "Space Grotesk"; white-space: nowrap; }
 .demo section { padding: 76px 0; }
-.demo-hero { min-height: 560px; display: grid; place-items: center; text-align: center; background: radial-gradient(circle at 50% 20%, #5f4630, transparent 42%), #151515; }
-.demo-hero h1 { color: #f6dca8; }
+.demo-hero { position: relative; isolation: isolate; min-height: 560px; display: grid; place-items: center; text-align: center; background-image: var(--hero-img); background-size: cover; background-position: center; }
+.demo-hero::before { position: absolute; z-index: 0; inset: 0; content: ""; background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)); }
+.demo-hero > div { position: relative; z-index: 1; }
+.demo-hero .eyebrow, .demo-hero h1, .demo-hero p { color: #fff; }
+body[data-demo="barbearia"] .demo-hero { background-position: center 35%; }
+body[data-demo="barbearia"] .demo-hero::before { background: linear-gradient(rgba(36,24,12,.56), rgba(36,24,12,.56)); }
 .demo-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
 .demo-card { min-width: 0; padding: 22px; border: 1px solid rgba(255,255,255,.14); background: var(--demo-surface); border-radius: 12px; }
 .demo-card h3 { color: var(--demo-accent); }
@@ -14,6 +18,8 @@ body.demo { min-width: 0; --demo-accent: #c49a54; --demo-surface: #242321; --dem
 .demo-gallery { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
 .demo-gallery div, .demo-gallery img { aspect-ratio: 1; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(135deg,#6c4a36,#b68a52); font-size: 2rem; overflow: hidden; }
 .demo-gallery img { width: 100%; height: 100%; object-fit: cover; }
+[data-demo="barbearia"] .demo-gallery img { object-fit: cover; object-position: center 30%; filter: saturate(.85) contrast(1.05) sepia(.12); transition: filter .3s, transform .3s; }
+[data-demo="barbearia"] .demo-gallery img:hover { filter: none; transform: scale(1.02); }
 .demo-form { max-width: 700px; margin: auto; display: grid; gap: 14px; padding: 25px; background: var(--demo-surface); border-radius: 14px; }
 .demo-form input, .demo-form select, .demo-form textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(128,128,128,.35); color: var(--demo-text); background: color-mix(in srgb, var(--demo-surface), #fff 7%); }
 .demo-form label { display: grid; gap: 6px; }
@@ -47,30 +53,22 @@ body.demo { min-width: 0; --demo-accent: #c49a54; --demo-surface: #242321; --dem
 .demo-toast.is-visible { opacity: 1; transform: translateY(0); }
 @keyframes demo-panel-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-body.restaurant { --demo-accent: #ae4c2f; --demo-surface: #fff; --demo-text: #32231e; background: #fff7ed; color: #32231e; }
-.restaurant .demo-bar { background: #c45736; color: white; }
-.restaurant .demo-hero { background: radial-gradient(circle at 50% 20%, #f5c58e, transparent 46%), #fff7ed; }
-.restaurant .demo-hero h1 { color: #ae4c2f; }
-.restaurant .demo-card { border: 1px solid #f0dccb; }
-.restaurant .demo-gallery div, .restaurant .demo-gallery img { background: linear-gradient(135deg,#e8a36d,#c45736); }
+body.restaurant { --demo-accent: #5a3a22; --demo-surface: #fff; --demo-text: #32231e; background: #faf3ea; color: #32231e; }
+.restaurant .demo-bar { background: #4a2e1b; color: white; }
+.restaurant .demo-card { border: 1px solid #e6d5c3; }
+.restaurant .demo-gallery div, .restaurant .demo-gallery img { background: linear-gradient(135deg,#8a5a3a,#4a2e1b); }
 body.salao { --demo-accent: #a65e79; --demo-surface: #fff; --demo-text: #35292d; background: #fff8fa; color: #35292d; }
 .salao .demo-bar { background: #c98ea4; color: white; }
-.salao .demo-hero { background: radial-gradient(circle at 50% 20%, #f2cad7, transparent 48%), #fff8fa; }
 .salao .demo-card { border-color: #efd9e1; }
 .salao .demo-gallery div, .salao .demo-gallery img { background: linear-gradient(135deg,#f1cad7,#cf94ad); }
 body.dentista { --demo-accent: #167d86; --demo-surface: #fff; --demo-text: #17383a; background: #f2fbfb; color: #17383a; }
 .dentista .demo-bar { color: white; }
-.dentista .demo-hero { background: radial-gradient(circle at 50% 20%, #bde8e5, transparent 48%), #f2fbfb; }
 body.pet { --demo-accent: #d07535; --demo-surface: #fff; --demo-text: #3a2a20; background: #fff8ef; color: #3a2a20; }
 .pet .demo-bar { color: white; }
-.pet .demo-hero { background: radial-gradient(circle at 50% 20%, #f4d1a6, transparent 48%), #fff8ef; }
 body.cafe { --demo-accent: #754322; --demo-surface: #fff; --demo-text: #36251b; background: #faf4eb; color: #36251b; }
 .cafe .demo-bar { color: white; }
-.cafe .demo-hero { background: radial-gradient(circle at 50% 20%, #e7c19c, transparent 48%), #faf4eb; }
 body.ginasio { --demo-accent: #a5f338; --demo-surface: #212821; --demo-text: #f3f6ef; background: #111611; color: #f3f6ef; }
 .ginasio .demo-bar { color: #111611; }
-.ginasio .demo-hero { background: radial-gradient(circle at 50% 20%, #39532d, transparent 48%), #111611; }
-.ginasio .demo-hero h1 { color: #d2ff9b; }
 .ginasio .demo-card { border-color: #394339; }
 .ginasio .demo-form input, .ginasio .demo-form select { color: var(--demo-text); background: #303830; }
 

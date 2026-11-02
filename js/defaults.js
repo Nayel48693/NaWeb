@@ -14,7 +14,7 @@ export const defaults = {
     { id: "barbearia", titulo: "Barbearia urbana", categoria: "barbearia", descricao: "Uma presença forte para serviços com marcação.", demoUrl: "demo-barbearia.html", imagem: "https://images.unsplash.com/photo-1672642150228-3fcd5826ec26?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Marcações", "WhatsApp"], ordem: 1, ativo: true },
     { id: "restaurante", titulo: "Restaurante de bairro", categoria: "restaurante", descricao: "Menu, horário e reservas num só lugar.", demoUrl: "demo-restaurante.html", imagem: "https://images.unsplash.com/photo-1741265805852-32186a6d0dd3?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Menu", "Reservas"], ordem: 2, ativo: true },
     { id: "salao", titulo: "Salão de beleza", categoria: "salao", descricao: "Tratamentos e agenda apresentados com leveza.", demoUrl: "demo-salao.html", imagem: "https://images.unsplash.com/photo-1633681117690-262b94a01378?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Serviços", "Agenda"], ordem: 3, ativo: true },
-    { id: "dentista", titulo: "Clínica dentária", categoria: "dentista", descricao: "Cuidados de saúde oral e marcações simples.", demoUrl: "demo-dentista.html", imagem: "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Saúde", "Marcações"], ordem: 4, ativo: true },
+    { id: "dentista", titulo: "Clínica dentária", categoria: "dentista", descricao: "Cuidados de saúde oral e marcações simples.", demoUrl: "demo-dentista.html", imagem: "assets/img/dentista-enfermeira.jpg", imagemUrl: "", tags: ["Saúde", "Marcações"], ordem: 4, ativo: true },
     { id: "pet", titulo: "Pet shop", categoria: "pet", descricao: "Produtos e serviços para animais de companhia.", demoUrl: "demo-pet.html", imagem: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Loja", "Animais"], ordem: 5, ativo: true },
     { id: "cafe", titulo: "Café de bairro", categoria: "cafe", descricao: "Menu, encomendas e sabores do dia.", demoUrl: "demo-cafe.html", imagem: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Menu", "Encomendas"], ordem: 6, ativo: true },
     { id: "ginasio", titulo: "Ginásio", categoria: "ginasio", descricao: "Planos, aulas e treinadores num só lugar.", demoUrl: "demo-ginasio.html", imagem: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80", imagemUrl: "", tags: ["Aulas", "Treino"], ordem: 7, ativo: true }
@@ -27,4 +27,9 @@ export const defaults = {
     { pergunta: "Como funciona a mensagem mensal?", resposta: "Envia as alterações num pedido simples e tratamos delas dentro do plano. TODO: definir prazo de resposta.", ordem: 5, ativo: true },
     { pergunta: "Como posso cancelar?", resposta: "TODO: indicar condições e aviso prévio de cancelamento.", ordem: 6, ativo: true }
   ]
+};
+
+export const LOCAL_CARD_IMAGES = {
+  barbearia: { src: "assets/img/barbeiro-capa.jpeg", fallback: "https://images.unsplash.com/photo-1672642150228-3fcd5826ec26?auto=format&fit=crop&w=800&q=80" },
+  dentista: { src: "assets/img/dentista-enfermeira.jpg", fallback: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=800&q=80" }
 };
