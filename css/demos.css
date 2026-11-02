@@ -70,6 +70,7 @@ body.cafe { --demo-accent: #754322; --demo-surface: #fff; --demo-text: #36251b; 
 .cafe .demo-bar { color: white; }
 body.ginasio { --demo-accent: #a5f338; --demo-surface: #212821; --demo-text: #f3f6ef; background: #111611; color: #f3f6ef; }
 .ginasio .demo-bar { color: #111611; }
+.ginasio .demo-gallery img { object-fit: cover; object-position: center 30%; }
 .ginasio .demo-card { border-color: #394339; }
 .ginasio .demo-form input, .ginasio .demo-form select { color: var(--demo-text); background: #303830; }
 
