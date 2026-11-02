@@ -61,6 +61,7 @@ body.salao { --demo-accent: #a65e79; --demo-surface: #fff; --demo-text: #35292d;
 .salao .demo-bar { background: #c98ea4; color: white; }
 .salao .demo-card { border-color: #efd9e1; }
 .salao .demo-gallery div, .salao .demo-gallery img { background: linear-gradient(135deg,#f1cad7,#cf94ad); }
+.salao .demo-gallery img { object-fit: cover; object-position: center 25%; }
 body.dentista { --demo-accent: #167d86; --demo-surface: #fff; --demo-text: #17383a; background: #f2fbfb; color: #17383a; }
 .dentista .demo-bar { color: white; }
 body.pet { --demo-accent: #d07535; --demo-surface: #fff; --demo-text: #3a2a20; background: #fff8ef; color: #3a2a20; }
