@@ -1,1 +1,1 @@
-Pasta reservada para imagens reais. As demos usam placeholders CSS/emoji até serem fornecidas imagens, conforme indicado nos TODOs.
+Esta pasta contém as imagens reais das demos.

@@ -87,9 +87,13 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse(400, { error: "invalid_request" });
   }
 
+  if (!env?.AI || typeof env.AI.run !== "function") {
+    return jsonResponse(502, { error: "ai_unavailable", reason: "binding_missing" });
+  }
+
+  let result;
   try {
-    if (!env?.AI || typeof env.AI.run !== "function") throw new Error("Workers AI binding unavailable");
-    const result = await env.AI.run(MODEL, {
+    result = await env.AI.run(MODEL, {
       messages: [
         {
           role: "system",
@@ -100,16 +104,19 @@ export async function onRequestPost({ request, env }) {
       max_tokens: MAX_TOKENS,
       temperature: 0.4
     });
-    const reply = typeof result?.response === "string"
-      ? result.response
-      : result?.choices?.[0]?.message?.content;
-    if (typeof reply !== "string" || !reply.trim()) throw new Error("Workers AI returned an empty response");
-    return jsonResponse(200, { reply: reply.trim() });
   } catch (error) {
     if (isQuotaError(error)) return jsonResponse(429, { error: "limit" });
-    console.error("Workers AI request failed", { status: error?.status || error?.statusCode || "unknown" });
-    return jsonResponse(502, { error: "ai_unavailable" });
+    console.error("Workers AI request failed", String(error?.message || error).slice(0, 200));
+    return jsonResponse(502, { error: "ai_unavailable", reason: "model_error" });
   }
+
+  const reply = typeof result?.response === "string"
+    ? result.response
+    : result?.choices?.[0]?.message?.content;
+  if (typeof reply !== "string" || !reply.trim()) {
+    return jsonResponse(502, { error: "ai_unavailable", reason: "empty_reply" });
+  }
+  return jsonResponse(200, { reply: reply.trim() });
 }
 
 export async function onRequest({ request, env }) {
