@@ -16,7 +16,7 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 6. Entra em `admin.html` e usa **Carregar dados iniciais** para preencher planos, exemplos, FAQ e `configuracoes/site`.
 7. O domínio público é `https://nawebs.com/`; confirma que canonical, `robots.txt` e `sitemap.xml` correspondem ao domínio publicado.
 8. Revê `privacidade.html`: é um modelo e precisa da identificação do responsável, prazos e detalhes legais reais.
-9. As sete demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma e Pulse Fit. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
+9. As oito demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma, Pulse Fit e Doce Mimo. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
 
 ## Publicar no GitHub Pages
 
@@ -24,27 +24,28 @@ Faz push deste conteúdo para um repositório GitHub e ativa Pages em **Settings
 
 ## Chatbot
 
-O chatbot usa uma arquitetura híbrida: as respostas por palavras-chave no browser são a primeira camada; quando nenhuma regra corresponde, a interface chama a Pages Function `functions/api/chat.js`, que envia o contexto atual do site e as últimas mensagens para o Workers AI. O histórico existe apenas em memória durante a visita e a NaWeb não guarda as conversas. Não há chave de API no código: a ligação é feita através do binding `AI` da Cloudflare.
+O chatbot usa uma arquitetura híbrida: as respostas por palavras-chave no browser são a primeira camada; quando nenhuma regra corresponde, a interface chama a Pages Function `functions/api/chat.js`, que envia o contexto atual do site e as últimas mensagens para a API Gemini. O histórico existe apenas em memória durante a visita e a NaWeb não guarda as conversas.
 
-O Workers AI tem um limite gratuito de **10 000 neurons por dia**, sujeito aos limites e condições atuais da Cloudflare. Para ligar o binding, abre **Cloudflare Dashboard > Workers & Pages > naweb > Settings > Bindings > Add > Workers AI**, define o nome da variável como `AI`, guarda e faz um novo deploy.
+Na Cloudflare Pages, abre **naweb > Settings > Variables and Secrets** e cria um Secret chamado `GEMINI_API_KEY` com a chave do Google AI Studio. Nunca coloques a chave no código nem no GitHub. Só os novos deploys recebem o Secret. O plano grátis do Google AI Studio tem limites de pedidos, sujeitos às condições atuais da Google; já não é necessário configurar o binding `AI`.
 
-Para testar localmente as Pages Functions, usa `npx wrangler pages dev . --ai AI` (com o binding Workers AI disponível na conta). O Live Server não executa Pages Functions; nesse caso, as respostas por regras continuam disponíveis, mas não a camada de IA.
+Para testar localmente as Pages Functions, cria um ficheiro `.dev.vars` na raiz com `GEMINI_API_KEY=...` e corre `npx wrangler pages dev .`. Não partilhes nem submetas esse ficheiro. O Live Server não executa Pages Functions; nesse caso, as respostas por regras continuam disponíveis, mas não a camada de IA.
 
 ## Checklist de testes
 
 - [ ] Rotador do hero e da barra, incluindo pausa e `prefers-reduced-motion`.
-- [ ] Filtros de exemplos sem recarregar a página, incluindo as sete categorias.
+- [ ] Filtros de exemplos sem recarregar a página, incluindo as oito categorias.
 - [ ] Escolha de plano a pré-selecionar o formulário.
 - [ ] Submissão do pedido: confirmação de receção no Formspree e gravação no Firestore; testar também cada serviço indisponível isoladamente.
 - [ ] Login no admin e verificação de permissões.
 - [ ] Alteração de estado e nota interna de um pedido.
 - [ ] Edição de planos e carregamento dos dados iniciais.
-- [ ] As sete demos em mobile, com imagens ou fallback ilustrado.
+- [ ] As oito demos em mobile, com imagens ou fallback ilustrado.
 - [ ] Em cada demo, abrir notificações e promoções, fechar com clique fora, Escape e novo clique; marcar notificações como lidas e testar o toast de promoção.
 - [ ] Demos Pet Amigo: filtros, detalhes, adicionar ao carrinho, quantidades, remoção e simulação de levantamento.
 - [ ] Demos Café Aroma e Pulse Fit: filtros de menu/horários e submissão dos formulários simulados.
+- [ ] Demo Doce Mimo: filtros de menu, notificações, promoções e encomenda simulada.
 - [ ] Demo Clínica Sorriso Claro: FAQ, serviços e pedido de marcação simulado.
 - [ ] Links de contacto, cookies essenciais e barra inferior.
-- [ ] Chatbot: testar respostas por regras, respostas de IA, fallback sem binding/com erro e limites de mensagens; confirmar que o histórico não persiste e que as mensagens são enviadas apenas à Pages Function.
+- [ ] Chatbot: testar respostas por regras, respostas de Gemini em `https://nawebs.pages.dev`, fallback sem chave/com erro e limites de mensagens; confirmar que o histórico não persiste e que as mensagens são enviadas apenas à Pages Function.
 - [ ] Chatbot: abrir/fechar com botão e Escape, foco acessível, respostas rápidas, ações WhatsApp/orçamento/exemplos/preços e indicador de escrita.
 - [ ] Chatbot: arrastar com rato e toque, mover com setas e guardar/restaurar a posição; testar resize, orientação, limites do ecrã, desktop/mobile e `prefers-reduced-motion`.

@@ -68,6 +68,12 @@ body.pet { --demo-accent: #d07535; --demo-surface: #fff; --demo-text: #3a2a20; b
 .pet .demo-bar { color: white; }
 body.cafe { --demo-accent: #754322; --demo-surface: #fff; --demo-text: #36251b; background: #faf4eb; color: #36251b; }
 .cafe .demo-bar { color: white; }
+body.confeitaria { --demo-accent: #b4235a; --demo-surface: #fffaf3; --demo-text: #493126; background: #fff5e9; color: #493126; }
+.confeitaria .demo-bar { color: white; }
+.confeitaria .demo-card { border-color: #efddce; }
+.confeitaria .demo-gallery div, .confeitaria .demo-gallery img { background: linear-gradient(135deg,#f3d9d5,#e8b9b1); }
+.confeitaria .demo-form { border: 1px solid #efddce; }
+.confeitaria .demo-form input, .confeitaria .demo-form select, .confeitaria .demo-form textarea { color: var(--demo-text); background: #fffdf9; }
 body.ginasio { --demo-accent: #a5f338; --demo-surface: #212821; --demo-text: #f3f6ef; background: #111611; color: #f3f6ef; }
 .ginasio .demo-bar { color: #111611; }
 .ginasio .demo-gallery img { object-fit: cover; object-position: center 30%; }

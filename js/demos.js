@@ -23,6 +23,10 @@ const DEMO_DATA = {
     notifications: [["🍰", "Novo bolo do dia", "Cheesecake de frutos vermelhos disponível.", "há 5 min"], ["☕", "Café acabado de tirar", "Passa por cá para uma pausa.", "há 30 min"], ["🥐", "Encomendas abertas", "Reserva já os teus favoritos para amanhã.", "ontem"]],
     promotions: [["Café + pastel de nata", "A combinação clássica para a tua pausa.", "2,50€", "PAUSA250", "Até às 11:00"], ["Brunch a dois", "Dois menus brunch e sumo natural.", "-10%", "BRUNCH10", "Fim de semana"], ["Bolo do dia", "Uma fatia com qualquer bebida quente.", "-1€", "BOLO1", "Enquanto houver"]]
   },
+  confeitaria: {
+    notifications: [["🎂", "Encomenda pronta", "O teu bolo está pronto para levantar.", "há 5 min"], ["🍓", "Novo sabor da semana", "Descobre o nosso bolo de framboesa.", "há 1 h"], ["🕒", "Horário de fim de semana", "Estamos abertos no sábado até às 18:00.", "ontem"]],
+    promotions: [["Caixa de macarons", "Uma seleção de seis sabores para partilhar.", "-10%", "MIMO10", "Até domingo"], ["Bolo de chocolate", "Um mimo doce para a tua próxima ocasião.", "-5€", "DOCE5", "Até ao fim do mês"], ["Croissant de amêndoa", "Acompanha o café com um toque especial.", "2 por 1", "AMENDOA", "Esta semana"]]
+  },
   ginasio: {
     notifications: [["🚴", "Aula com vagas", "Aula de Spinning às 18:30 com vagas.", "há 5 min"], ["🏋️", "Novo horário", "Consulta o horário atualizado de aulas.", "há 1 h"], ["💪", "Treino da semana", "Experimenta uma aula de HIIT esta semana.", "ontem"]],
     promotions: [["Primeiro mês", "Começa a treinar com acompanhamento.", "-50%", "PULSE50", "Novas inscrições"], ["Plano anual", "Compromisso com a tua rotina.", "-15%", "ANUAL15", "Até ao fim do mês"], ["Aula experimental", "Vem conhecer o espaço sem compromisso.", "Grátis", "TESTE", "Mediante marcação"]]

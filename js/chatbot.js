@@ -95,7 +95,7 @@ export function initChatbot(state = {}) {
     }
     const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
     if (wordCount > 4 && !quickReplyLabels.some((label) => normalize(label) === text)) return null;
-    if (includesAny("que site fazem", "tipos de site", "tipo de site", "para que negocio", "que negocios")) {
+    if (includesAny("que site fazem", "tipos de site", "tipo de site", "para que negocio", "que negocios", "confeitaria", "pastelaria", "bolo", "bolos")) {
       const titles = exemplos.filter((item) => item.ativo !== false).map((item) => item.titulo).filter(Boolean);
       return {
         texto: titles.length ? `Temos exemplos para estes tipos de negócio: ${titles.join(", ")}.` : "Ainda não temos exemplos disponíveis para apresentar.",

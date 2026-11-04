@@ -1,19 +1,16 @@
-// Troca por outro modelo de texto disponível no catálogo Workers AI, se necessário.
-const MODEL = "@cf/meta/llama-3.1-8b-instruct";
-const MAX_TOKENS = 300;
+// Pode ser trocado por outro modelo Flash disponível no plano grátis do Google AI Studio.
+const MODEL = "gemini-3.8-flash";
 const MAX_MESSAGES = 8;
 const MAX_CHARS = 500;
 const MAX_CONTEXT_CHARS = 2000;
 const ALLOWED_HOSTNAMES = [
   "nawebs.com",
   "www.nawebs.com",
-  "nayweb.pages.dev",
   "nawebs.pages.dev"
-  // Remover os pages.dev quando o domínio nawebs.com estiver ligado e testado.
 ];
 
 const REGRAS_DO_ASSISTENTE = [
-  "És o assistente virtual da NaWeb, estúdio que cria websites para pequenos negócios (barbearias, restaurantes, salões, clínicas, pet shops, cafés, ginásios) em Portugal.",
+  "És o assistente virtual da NaWeb, estúdio que cria websites para pequenos negócios (barbearias, restaurantes, salões, clínicas, pet shops, cafés, confeitarias e ginásios) em Portugal.",
   "Responde sempre em português de Portugal (usa \"tu\", \"telemóvel\", \"equipa\"; nunca \"você\", \"celular\", \"time\"), de forma simpática, direta e curta: no máximo 3 frases.",
   "Só falas sobre a NaWeb: serviços (website, sistema de marcação, manutenção), planos, preços, como funciona, prazos, exemplos e contacto. Para outros assuntos, diz com simpatia que só podes ajudar com a NaWeb.",
   "Usa APENAS os dados em \"DADOS ATUAIS DO SITE\". Nunca inventes preços, prazos, descontos, funcionalidades, garantias ou condições legais. Se não souberes ou o ponto não estiver confirmado, diz que a equipa confirma e sugere o WhatsApp.",
@@ -24,9 +21,29 @@ const REGRAS_DO_ASSISTENTE = [
   "No fim da resposta, quando fizer sentido, acrescenta numa linha própria no máximo duas etiquetas: [[ACAO:WHATSAPP]], [[ACAO:ORCAMENTO]], [[ACAO:EXEMPLOS]], [[ACAO:PRECOS]]."
 ].join("\n");
 
-// === COMANDOS PERSONALIZADOS ===
-// Exemplo: Se perguntarem [PERGUNTA], responde [RESPOSTA].
-// Exemplo: Se perguntarem [PERGUNTA], responde [RESPOSTA].
+const COMANDOS_PERSONALIZADOS = [
+  {
+    pergunta: "Qual é o horário de resposta da equipa?",
+    resposta: "A equipa responde em dias úteis, normalmente no próprio dia. Não indiques horas exatas."
+  },
+  {
+    pergunta: "Como posso pedir um orçamento?",
+    resposta: "Podes pedir um orçamento através do formulário de contacto ou falar connosco pelo WhatsApp."
+  },
+  {
+    pergunta: "O que está incluído no plano Start?",
+    resposta: "Usa apenas as funcionalidades e os preços do plano Start indicados em DADOS ATUAIS DO SITE; se esses dados não estiverem disponíveis, diz que a equipa confirma."
+  }
+];
+
+const getPersonalizedCommands = () => {
+  if (!COMANDOS_PERSONALIZADOS.length) return "";
+  const lines = COMANDOS_PERSONALIZADOS.map(({ pergunta, resposta }) => `- Pergunta: ${pergunta} Resposta: ${resposta}`);
+  return [
+    "COMANDOS PERSONALIZADOS (quando a pessoa perguntar algo equivalente à pergunta, responde com a resposta indicada, adaptando só o necessário):",
+    ...lines
+  ].join("\n");
+};
 
 const jsonResponse = (status, body) => new Response(JSON.stringify(body), {
   status,
@@ -48,15 +65,11 @@ const isAllowedOrigin = (value) => {
   if (url.protocol === "http:") return hostname === "localhost" || hostname === "127.0.0.1";
   if (url.protocol !== "https:") return false;
   return ALLOWED_HOSTNAMES.some((allowedHostname) => hostname === allowedHostname
-    || ((allowedHostname === "nayweb.pages.dev" || allowedHostname === "nawebs.pages.dev")
-      && hostname.endsWith(`.${allowedHostname}`)));
+    || (allowedHostname === "nawebs.pages.dev" && hostname.endsWith(`.${allowedHostname}`)));
 };
 
-const isQuotaError = (error) => {
-  const message = String(error?.message || "").toLowerCase();
-  return error?.status === 429 || error?.statusCode === 429
-    || /quota|daily limit|rate.?limit|too many requests|neurons/.test(message);
-};
+const isQuotaError = (status, message = "") => status === 429
+  || /quota|daily limit|rate.?limit|too many requests/.test(String(message).toLowerCase());
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -87,33 +100,50 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse(400, { error: "invalid_request" });
   }
 
-  if (!env?.AI || typeof env.AI.run !== "function") {
-    return jsonResponse(502, { error: "ai_unavailable", reason: "binding_missing" });
+  if (!env?.GEMINI_API_KEY) {
+    return jsonResponse(502, { error: "ai_unavailable", reason: "key_missing" });
+  }
+
+  const contexto = body.contexto.slice(0, MAX_CONTEXT_CHARS);
+  const comandos = getPersonalizedCommands();
+  const systemInstruction = `${REGRAS_DO_ASSISTENTE}\n\n${comandos ? `${comandos}\n\n` : ""}DADOS ATUAIS DO SITE:\n${contexto}`;
+  let response;
+  try {
+    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": env.GEMINI_API_KEY
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents: messages.map(({ role, content }) => ({
+          role: role === "assistant" ? "model" : "user",
+          parts: [{ text: content }]
+        })),
+        generationConfig: { maxOutputTokens: 500, temperature: 0.4 }
+      })
+    });
+  } catch (_) {
+    return jsonResponse(502, { error: "ai_unavailable", reason: "model_error" });
   }
 
   let result;
   try {
-    result = await env.AI.run(MODEL, {
-      messages: [
-        {
-          role: "system",
-          content: `${REGRAS_DO_ASSISTENTE}\n\nDADOS ATUAIS DO SITE:\n${body.contexto.slice(0, MAX_CONTEXT_CHARS)}`
-        },
-        ...messages
-      ],
-      max_tokens: MAX_TOKENS,
-      temperature: 0.4
-    });
-  } catch (error) {
-    if (isQuotaError(error)) return jsonResponse(429, { error: "limit" });
-    console.error("Workers AI request failed", String(error?.message || error).slice(0, 200));
+    result = await response.json();
+  } catch (_) {
+    result = null;
+  }
+  const errorMessage = result?.error?.message || "";
+  if (!response.ok) {
+    if (isQuotaError(response.status, errorMessage)) return jsonResponse(429, { error: "limit" });
+    console.error(response.status);
     return jsonResponse(502, { error: "ai_unavailable", reason: "model_error" });
   }
 
-  const reply = typeof result?.response === "string"
-    ? result.response
-    : result?.choices?.[0]?.message?.content;
-  if (typeof reply !== "string" || !reply.trim()) {
+  const parts = result?.candidates?.[0]?.content?.parts || [];
+  const reply = parts.filter((part) => typeof part.text === "string").map((part) => part.text).join("");
+  if (result?.promptFeedback?.blockReason || !reply.trim()) {
     return jsonResponse(502, { error: "ai_unavailable", reason: "empty_reply" });
   }
   return jsonResponse(200, { reply: reply.trim() });
