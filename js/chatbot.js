@@ -289,7 +289,7 @@ export function initChatbot(state = {}) {
   const askAi = async () => {
     aiCalls += 1;
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 20000);
+    const timeout = window.setTimeout(() => controller.abort(), 25000);
     try {
       const response = await fetch("/api/chat", {
         method: "POST",

@@ -11,7 +11,7 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 1. O projeto Firebase `nayweb-dd8f1` já está ligado em `js/firebase.js` através do `firebaseConfig` existente.
 2. No Firebase Console, ativa Firestore e Authentication com email/password e configura as regras de segurança antes de publicar.
 3. Copia o conteúdo de `firestore.rules` para o separador **Firestore Database > Rules** e publica as regras.
-4. Edita os contactos em `js/config.js` quando tiveres os dados definitivos e substitui `COLOCAR_ID_AQUI` em `FORMSPREE_ENDPOINT` pelo ID real do formulário Formspree. Os pedidos são enviados por email através do Formspree e também guardados no Firestore quando este está configurado.
+4. Edita os contactos em `js/config.js` quando tiveres os dados definitivos. Os pedidos de contacto são guardados no Firestore e ficam disponíveis no painel `admin.html`; não é enviado email automaticamente.
 5. Cria o primeiro utilizador no Firebase Authentication e depois cria manualmente `admins/{UID}` no Firestore, com o campo `email`.
 6. Entra em `admin.html` e usa **Carregar dados iniciais** para preencher planos, exemplos, FAQ e `configuracoes/site`.
 7. O domínio público é `https://nawebs.com/`; confirma que canonical, `robots.txt` e `sitemap.xml` correspondem ao domínio publicado.
@@ -35,7 +35,7 @@ Para testar localmente as Pages Functions, cria um ficheiro `.dev.vars` na raiz 
 - [ ] Rotador do hero e da barra, incluindo pausa e `prefers-reduced-motion`.
 - [ ] Filtros de exemplos sem recarregar a página, incluindo as oito categorias.
 - [ ] Escolha de plano a pré-selecionar o formulário.
-- [ ] Submissão do pedido: confirmação de receção no Formspree e gravação no Firestore; testar também cada serviço indisponível isoladamente.
+- [ ] Submissão do pedido: confirmar gravação no Firestore e visibilidade no admin; testar também o erro se o Firestore estiver indisponível.
 - [ ] Login no admin e verificação de permissões.
 - [ ] Alteração de estado e nota interna de um pedido.
 - [ ] Edição de planos e carregamento dos dados iniciais.

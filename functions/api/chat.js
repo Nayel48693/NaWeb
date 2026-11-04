@@ -1,5 +1,5 @@
 // Pode ser trocado por outro modelo Flash disponível no plano grátis do Google AI Studio.
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.5-flash-lite";
 const MAX_MESSAGES = 8;
 const MAX_CHARS = 500;
 const MAX_CONTEXT_CHARS = 2000;
@@ -107,10 +107,13 @@ export async function onRequestPost({ request, env }) {
   const contexto = body.contexto.slice(0, MAX_CONTEXT_CHARS);
   const comandos = getPersonalizedCommands();
   const systemInstruction = `${REGRAS_DO_ASSISTENTE}\n\n${comandos ? `${comandos}\n\n` : ""}DADOS ATUAIS DO SITE:\n${contexto}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
   let response;
   try {
     response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         "x-goog-api-key": env.GEMINI_API_KEY
@@ -121,11 +124,14 @@ export async function onRequestPost({ request, env }) {
           role: role === "assistant" ? "model" : "user",
           parts: [{ text: content }]
         })),
-        generationConfig: { maxOutputTokens: 500, temperature: 0.4 }
+        generationConfig: { maxOutputTokens: 1024, temperature: 0.4 }
       })
     });
-  } catch (_) {
+  } catch (error) {
+    if (error?.name === "AbortError") return jsonResponse(504, { error: "ai_unavailable", reason: "timeout" });
     return jsonResponse(502, { error: "ai_unavailable", reason: "model_error" });
+  } finally {
+    clearTimeout(timeout);
   }
 
   let result;

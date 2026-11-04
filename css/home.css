@@ -50,7 +50,8 @@
 .footer-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 28px; }
 .footer-links { display: grid; gap: 8px; }
 .footer-links a { color: var(--muted); text-decoration: none; }
-.cookie { position: fixed; left: 16px; bottom: 16px; z-index: 30; max-width: 380px; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.cookie { display: none; position: fixed; left: 16px; bottom: 16px; z-index: 30; max-width: 380px; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.naweb-cookie-pending .cookie { display: block; }
 .notice-bar { position: fixed; left: 50%; bottom: 16px; z-index: 25; width: min(720px, calc(100% - 32px)); transform: translate(-50%, 150%); transition: transform .35s ease; padding: 12px 14px; display: flex; align-items: center; gap: 12px; background: var(--text); color: white; border-radius: 12px; box-shadow: var(--shadow); }
 .notice-bar.is-visible { transform: translate(-50%, 0); }
 .notice-bar .rotating-line { flex: 1; color: white; font-size: .9rem; }
