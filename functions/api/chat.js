@@ -36,14 +36,39 @@ const COMANDOS_PERSONALIZADOS = [
   }
 ];
 
-const getPersonalizedCommands = () => {
-  if (!COMANDOS_PERSONALIZADOS.length) return "";
-  const lines = COMANDOS_PERSONALIZADOS.map(({ pergunta, resposta }) => `- Pergunta: ${pergunta} Resposta: ${resposta}`);
+const CHATBOT_CONFIG_URL = "https://firestore.googleapis.com/v1/projects/nayweb-dd8f1/databases/(default)/documents/configuracoes/chatbot";
+let personalizedCommandCache = null;
+let personalizedCommandCacheExpiresAt = 0;
+
+const formatPersonalizedCommands = (commands) => {
+  if (!commands.length) return "";
+  const lines = commands.map(({ pergunta, resposta }) => `- Pergunta: ${pergunta} Resposta: ${resposta}`);
   return [
     "COMANDOS PERSONALIZADOS (quando a pessoa perguntar algo equivalente à pergunta, responde com a resposta indicada, adaptando só o necessário):",
     ...lines
   ].join("\n");
 };
+
+async function getPersonalizedCommands() {
+  if (personalizedCommandCache && Date.now() < personalizedCommandCacheExpiresAt) {
+    return formatPersonalizedCommands(personalizedCommandCache);
+  }
+  try {
+    const response = await fetch(CHATBOT_CONFIG_URL);
+    if (!response.ok) throw new Error("Chatbot settings unavailable");
+    const result = await response.json();
+    const values = result?.fields?.comandos?.arrayValue?.values || [];
+    personalizedCommandCache = values.map((value) => ({
+      pergunta: value?.mapValue?.fields?.pergunta?.stringValue,
+      resposta: value?.mapValue?.fields?.resposta?.stringValue
+    })).filter((command) => typeof command.pergunta === "string" && command.pergunta.trim()
+      && typeof command.resposta === "string" && command.resposta.trim()).slice(0, 20);
+  } catch (_) {
+    personalizedCommandCache = COMANDOS_PERSONALIZADOS;
+  }
+  personalizedCommandCacheExpiresAt = Date.now() + 60000;
+  return formatPersonalizedCommands(personalizedCommandCache);
+}
 
 const jsonResponse = (status, body) => new Response(JSON.stringify(body), {
   status,
@@ -105,11 +130,12 @@ export async function onRequestPost({ request, env }) {
   }
 
   const contexto = body.contexto.slice(0, MAX_CONTEXT_CHARS);
-  const comandos = getPersonalizedCommands();
+  const comandos = await getPersonalizedCommands();
   const systemInstruction = `${REGRAS_DO_ASSISTENTE}\n\n${comandos ? `${comandos}\n\n` : ""}DADOS ATUAIS DO SITE:\n${contexto}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12000);
   let response;
+  let result;
   try {
     response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
       method: "POST",
@@ -127,6 +153,7 @@ export async function onRequestPost({ request, env }) {
         generationConfig: { maxOutputTokens: 1024, temperature: 0.4 }
       })
     });
+    result = await response.json();
   } catch (error) {
     if (error?.name === "AbortError") return jsonResponse(504, { error: "ai_unavailable", reason: "timeout" });
     return jsonResponse(502, { error: "ai_unavailable", reason: "model_error" });
@@ -134,12 +161,6 @@ export async function onRequestPost({ request, env }) {
     clearTimeout(timeout);
   }
 
-  let result;
-  try {
-    result = await response.json();
-  } catch (_) {
-    result = null;
-  }
   const errorMessage = result?.error?.message || "";
   if (!response.ok) {
     if (isQuotaError(response.status, errorMessage)) return jsonResponse(429, { error: "limit" });

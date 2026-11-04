@@ -6,78 +6,110 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Admin | NaWeb</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="admin">
-  <main class="container admin-main">
-    <div id="login" class="card contact-form admin-login">
-      <a class="logo" href="index.html">Na<span>Web</span></a>
-      <h1>Área administrativa</h1>
-      <p>Entra com o email e palavra-passe do Firebase Authentication.</p>
-      <form id="login-form">
-        <div class="field"><label for="admin-email">Email</label><input id="admin-email" type="email" required></div>
-        <div class="field"><label for="admin-password">Palavra-passe</label><input id="admin-password" type="password" required></div>
-        <button class="btn btn-primary" type="submit">Entrar</button>
-      </form>
-      <p id="login-status" class="form-error" role="alert"></p>
-    </div>
-    <div id="app" hidden>
-      <div class="admin-heading"><div><a class="logo" href="index.html">Na<span>Web</span></a><h1>Admin</h1></div><div><button id="enable-notifications" class="btn btn-small" type="button">Ativar notificações</button><button id="logout" class="btn btn-secondary" type="button">Sair</button></div></div>
-      <p id="admin-status" role="status"></p>
-      <nav class="admin-nav" aria-label="Secções administrativas">
-        <button class="btn btn-small" type="button" data-tab="summary">Resumo</button>
-        <button class="btn btn-small" type="button" data-tab="orders-panel">Pedidos</button>
-        <button class="btn btn-small" type="button" data-tab="plan-list">Planos</button>
-        <button class="btn btn-small" type="button" data-tab="charts-panel">Gráficos</button>
-        <button class="btn btn-small" type="button" data-tab="visits-panel">Visitantes</button>
-        <button id="seed" class="btn btn-primary btn-small" type="button">Carregar dados iniciais</button>
-      </nav>
-      <section id="summary" class="admin-panel is-active" aria-labelledby="summary-title">
-        <h2 id="summary-title">Resumo</h2>
-        <div class="admin-grid">
-          <div class="card admin-stat"><span>Total de pedidos</span><strong id="summary-total">—</strong></div>
-          <div class="card admin-stat"><span>Pedidos novos</span><strong id="summary-new">—</strong></div>
-          <div class="card admin-stat"><span>Este mês</span><strong id="summary-month">—</strong></div>
-          <div class="card admin-stat"><span>Por plano</span><div id="summary-plans" class="summary-plans">—</div></div>
-        </div>
-      </section>
-      <section id="orders-panel" class="admin-panel" aria-labelledby="orders-title">
-        <h2 id="orders-title">Pedidos</h2>
-        <div class="admin-filters">
-          <div class="field"><label for="order-search">Pesquisar nome ou email</label><input id="order-search" type="search" placeholder="Ex.: Ana ou email@exemplo.pt"></div>
-          <div class="field"><label for="order-status-filter">Filtrar por estado</label><select id="order-status-filter"><option value="todos">Todos</option><option value="novo">Novo</option><option value="contactado">Contactado</option><option value="fechado">Fechado</option><option value="perdido">Perdido</option></select></div>
-        </div>
-        <p id="orders-loading" class="admin-loading" role="status" hidden>A carregar pedidos…</p>
-        <p id="orders-error" class="form-error" role="alert"></p>
-        <div id="orders" class="admin-list"></div>
-        <button id="orders-more" class="btn btn-secondary" type="button" hidden>Carregar mais</button>
-      </section>
-      <section id="plan-list" class="admin-panel" aria-labelledby="plans-title">
-        <h2 id="plans-title">Planos</h2>
-        <p id="plans-loading" class="admin-loading" role="status" hidden>A carregar planos…</p>
-        <p id="plans-error" class="form-error" role="alert"></p>
-        <div id="plans" class="admin-list"></div>
-      </section>
-      <section id="charts-panel" class="admin-panel" aria-labelledby="charts-title">
-        <h2 id="charts-title">Gráficos</h2>
-        <div class="chart-grid">
-          <article class="card chart-card"><h3>Pedidos ao longo do tempo</h3><div class="chart-frame"><canvas id="orders-time-chart" aria-label="Pedidos por mês" role="img"></canvas></div></article>
-          <article class="card chart-card"><h3>Distribuição por estado</h3><div class="chart-frame chart-frame-small"><canvas id="orders-status-chart" aria-label="Pedidos por estado" role="img"></canvas></div></article>
-          <article class="card chart-card"><h3>Distribuição por plano</h3><div class="chart-frame"><canvas id="orders-plan-chart" aria-label="Pedidos por plano" role="img"></canvas></div></article>
-          <article class="card chart-card"><h3>Distribuição por tipo de negócio</h3><div class="chart-frame"><canvas id="orders-business-chart" aria-label="Pedidos por tipo de negócio" role="img"></canvas></div></article>
-          <article class="card chart-card chart-card-wide"><h3>Receita estimada por mês</h3><p class="chart-note">Estimativa baseada no preço do plano associado a pedidos fechados — não reflete pagamentos reais registados.</p><div class="chart-frame"><canvas id="revenue-chart" aria-label="Receita estimada por mês" role="img"></canvas></div></article>
-        </div>
-      </section>
-      <section id="visits-panel" class="admin-panel" aria-labelledby="visits-title">
-        <h2 id="visits-title">Visitantes</h2>
-        <article class="card admin-stat"><span>Visitas registadas (total)</span><strong id="visits-total">—</strong></article>
-        <p id="visits-error" class="form-note" role="alert"></p>
-        <p class="form-note">Número aproximado (não deduplica bem visitantes que voltam noutro dia). Para dados completos e reais, consulta o Firebase Analytics no Firebase Console.</p>
-      </section>
-    </div>
+  <main class="admin-shell">
+    <section id="login" class="login-screen">
+      <div class="login-card">
+        <a class="logo" href="index.html">Na<span>Web</span></a>
+        <span class="eyebrow">Área reservada</span>
+        <h1>Entrar</h1>
+        <p>Entra para gerir pedidos e acompanhar o teu negócio.</p>
+        <form id="login-form" novalidate>
+          <div class="field"><label for="admin-email">Email</label><input id="admin-email" type="email" autocomplete="username" required></div>
+          <div class="field password-field"><label for="admin-password">Palavra-passe</label><div><input id="admin-password" type="password" autocomplete="current-password" required><button id="toggle-password" class="text-button" type="button" aria-label="Mostrar palavra-passe" aria-pressed="false">Mostrar</button></div></div>
+          <label class="check-row"><input id="keep-session" type="checkbox" checked><span>Manter sessão iniciada neste dispositivo</span></label>
+          <button id="login-submit" class="btn btn-primary login-submit" type="submit">Entrar</button>
+          <button id="password-reset" class="text-button reset-link" type="button">Esqueci-me da palavra-passe</button>
+        </form>
+        <p id="login-status" class="admin-message" role="alert"></p>
+      </div>
+    </section>
+    <section id="app" class="admin-app" hidden>
+      <aside class="admin-sidebar">
+        <a class="logo" href="index.html">Na<span>Web</span></a>
+        <nav class="admin-nav" aria-label="Navegação administrativa">
+          <button class="nav-item is-active" type="button" data-tab="summary"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg><span>Resumo</span></button>
+          <button class="nav-item" type="button" data-tab="orders-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span>Pedidos</span><span id="orders-badge" class="nav-badge" hidden>0</span></button>
+          <button class="nav-item" type="button" data-tab="clients-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M17 4a4 4 0 0 1 0 8M18 14a6 6 0 0 1 4 6v1"/></svg><span>Clientes</span></button>
+          <button class="nav-item" type="button" data-tab="visits-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 14l4-4 4 3 6-7"/></svg><span>Visitantes</span></button>
+          <button class="nav-item" type="button" data-tab="plan-list"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18l-2 14H5L3 7zM8 7a4 4 0 0 1 8 0"/></svg><span>Planos</span></button>
+          <button class="nav-item" type="button" data-tab="settings-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.6 2.8-.2-.1a1.8 1.8 0 0 0-1.9.4l-.1.1h-3.2l-.1-.2a1.8 1.8 0 0 0-1.5-1.2 1.8 1.8 0 0 0-1.7.7l-.1.2-2.8-1.6.1-.2a1.8 1.8 0 0 0-.4-1.9l-.1-.1v-3.2l.2-.1a1.8 1.8 0 0 0 1.2-1.5 1.8 1.8 0 0 0-.7-1.7l-.2-.1 1.6-2.8.2.1a1.8 1.8 0 0 0 1.9-.4l.1-.1h3.2l.1.2a1.8 1.8 0 0 0 1.5 1.2 1.8 1.8 0 0 0 1.7-.7l.1-.2 2.8 1.6-.1.2a1.8 1.8 0 0 0 .4 1.9l.1.1v3.2z"/></svg><span>Definições</span></button>
+        </nav>
+        <button id="theme-toggle" class="theme-toggle" type="button">◐ <span>Modo de cor</span></button>
+      </aside>
+      <div class="admin-content">
+        <header class="admin-topbar">
+          <div><p id="admin-date" class="admin-date"></p><h1 id="greeting">Olá</h1></div>
+          <div class="topbar-actions"><span id="notification-status" class="notification-status">Notificações desativadas</span><button id="enable-notifications" class="btn btn-secondary btn-small" type="button">Ativar notificações</button><button id="logout" class="btn btn-secondary btn-small" type="button">Sair</button></div>
+        </header>
+        <p id="admin-status" class="admin-message" role="status"></p>
+        <section id="summary" class="admin-panel is-active" aria-labelledby="summary-title">
+          <div class="section-title"><div><span class="eyebrow">Visão geral</span><h2 id="summary-title">Resumo</h2></div></div>
+          <div class="metric-grid">
+            <article class="card metric"><span>Pedidos novos</span><strong id="summary-new">—</strong><small>À espera de resposta</small></article>
+            <article class="card metric"><span>Total de pedidos</span><strong id="summary-total">—</strong><small>Todos os estados</small></article>
+            <article class="card metric"><span>Taxa de conversão</span><strong id="summary-conversion">—</strong><small>Pedidos fechados</small></article>
+            <article class="card metric"><span>Receita mensal recorrente</span><strong id="summary-mrr">—</strong><small>Clientes ativos</small></article>
+            <article class="card metric"><span>Visitas hoje</span><strong id="summary-visits-today">—</strong><small>Últimos 7 dias: <b id="summary-visits-week">—</b></small></article>
+          </div>
+          <div id="stale-orders-alert" class="admin-alert" hidden></div>
+          <div class="dashboard-grid">
+            <article class="card dashboard-card"><div class="card-heading"><h3>Visitas · últimos 14 dias</h3><button class="text-button" type="button" data-go-tab="visits-panel">Ver relatório</button></div><div class="chart-frame"><canvas id="summary-visits-chart" aria-label="Visitas nos últimos 14 dias" role="img"></canvas></div></article>
+            <article class="card dashboard-card"><div class="card-heading"><h3>Pedidos recentes</h3><button class="text-button" type="button" data-go-tab="orders-panel">Ver todos</button></div><div id="recent-orders" class="compact-list"><div class="skeleton"></div></div></article>
+          </div>
+        </section>
+        <section id="orders-panel" class="admin-panel" aria-labelledby="orders-title">
+          <div class="section-title"><div><span class="eyebrow">Acompanhamento</span><h2 id="orders-title">Pedidos</h2></div><button id="export-orders" class="btn btn-secondary btn-small" type="button">Exportar CSV</button></div>
+          <div class="filter-grid card">
+            <label>Pesquisar<input id="order-search" type="search" placeholder="Nome, email ou telemóvel"></label>
+            <label>Estado<select id="order-status-filter"><option value="todos">Todos os estados</option><option value="novo">Novo</option><option value="contactado">Contactado</option><option value="fechado">Fechado</option><option value="perdido">Perdido</option></select></label>
+            <label>Plano<select id="order-plan-filter"><option value="todos">Todos os planos</option></select></label>
+            <label>Tipo de negócio<select id="order-business-filter"><option value="todos">Todos os negócios</option></select></label>
+            <label>Desde<input id="order-date-from" type="date"></label><label>Até<input id="order-date-to" type="date"></label>
+          </div>
+          <div class="view-switch" role="group" aria-label="Vista de pedidos"><button class="btn btn-small is-active" type="button" data-orders-view="list">Lista</button><button class="btn btn-small" type="button" data-orders-view="board">Quadro</button></div>
+          <p id="orders-loading" class="admin-loading skeleton" role="status" hidden>A carregar pedidos…</p><p id="orders-error" class="form-error" role="alert"></p>
+          <div id="orders" class="admin-list"></div><button id="orders-more" class="btn btn-secondary" type="button" hidden>Carregar mais</button>
+        </section>
+        <section id="clients-panel" class="admin-panel" aria-labelledby="clients-title">
+          <div class="section-title"><div><span class="eyebrow">Relação contínua</span><h2 id="clients-title">Clientes</h2></div></div>
+          <div class="metric-grid client-metrics"><article class="card metric"><span>Receita mensal recorrente</span><strong id="clients-mrr">0,00 €</strong></article><article class="card metric"><span>Valores por receber</span><strong id="clients-due">0,00 €</strong></article></div>
+          <div id="billing-alert" class="admin-alert" hidden></div><p id="clients-error" class="form-error" role="alert"></p>
+          <article class="card admin-table"><table><thead><tr><th>Cliente</th><th>Plano</th><th>Estado</th><th>Pagamentos</th><th>Mensalidade</th><th>Ações</th></tr></thead><tbody id="clients"></tbody></table><p id="clients-empty" class="empty-state" hidden>Ainda não existem clientes. Converte um pedido ou adiciona um cliente.</p></article>
+          <details class="card create-client"><summary>Adicionar cliente</summary><form id="client-form" class="form-grid"><label>Nome<input name="nome" required></label><label>Contacto<input name="contacto"></label><label>Plano<input name="plano"></label><label>Valor de criação (€)<input name="valorCriacao" type="number" step="0.01" min="0" value="0"></label><label>Mensalidade (€)<input name="mensalidade" type="number" step="0.01" min="0" value="0"></label><label>Início<input name="inicio" type="date"></label><label>Próxima cobrança<input name="proximaCobranca" type="date"></label><button class="btn btn-primary" type="submit">Adicionar cliente</button></form></details>
+        </section>
+        <section id="visits-panel" class="admin-panel" aria-labelledby="visits-title">
+          <div class="section-title"><div><span class="eyebrow">Estatísticas agregadas</span><h2 id="visits-title">Visitantes</h2></div><button id="export-visits" class="btn btn-secondary btn-small" type="button">Exportar CSV</button></div>
+          <p class="form-note">A contagem representa sessões e é aproximada. Não são guardados endereços IP nem dados pessoais.</p>
+          <div class="metric-grid visitor-metrics">
+            <article class="card metric"><span>Hoje</span><strong id="visits-today">—</strong></article><article class="card metric"><span>Ontem</span><strong id="visits-yesterday">—</strong></article><article class="card metric"><span>Últimos 7 dias</span><strong id="visits-week">—</strong></article><article class="card metric"><span>Este mês</span><strong id="visits-month">—</strong></article><article class="card metric"><span>Este ano</span><strong id="visits-year">—</strong></article><article class="card metric"><span>Total histórico</span><strong id="visits-total">—</strong><small id="visits-history-note"></small></article><article class="card metric"><span>Melhor dia</span><strong id="visits-best">—</strong></article><article class="card metric"><span>Média diária</span><strong id="visits-average">—</strong></article>
+          </div>
+          <div class="visitor-controls card"><button id="period-prev" class="btn btn-secondary btn-small" type="button" aria-label="Período anterior">←</button><label>Ano<select id="visits-year"></select></label><label>Mês<select id="visits-month"><option value="todos">Todos</option><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></label><button id="period-next" class="btn btn-secondary btn-small" type="button" aria-label="Período seguinte">→</button></div>
+          <div class="view-switch visitor-tabs" role="tablist" aria-label="Vista das estatísticas"><button class="btn btn-small is-active" type="button" data-visitor-view="day">Por dia</button><button class="btn btn-small" type="button" data-visitor-view="weekday">Por dia da semana</button><button class="btn btn-small" type="button" data-visitor-view="month">Por mês</button><button class="btn btn-small" type="button" data-visitor-view="year">Por ano</button></div>
+          <p id="visits-error" class="form-error" role="alert"></p><article class="card chart-card"><h3>Visitas no período</h3><div class="chart-frame"><canvas id="visits-period-chart" aria-label="Gráfico de visitas no período" role="img"></canvas></div></article>
+          <article class="card admin-table"><div id="visitor-table" class="table-scroll"></div></article>
+          <div class="dashboard-grid demo-analytics"><article class="card chart-card"><h3>Demos mais vistas</h3><div class="chart-frame"><canvas id="demo-views-chart" aria-label="Gráfico de visualizações por demo" role="img"></canvas></div></article><article class="card"><h3>Visualizações por demo</h3><div id="demo-views-table"></div></article></div>
+        </section>
+        <section id="plan-list" class="admin-panel" aria-labelledby="plans-title"><div class="section-title"><div><span class="eyebrow">Oferta</span><h2 id="plans-title">Planos</h2></div></div><p id="plans-error" class="form-error" role="alert"></p><div id="plans" class="plan-list"><div class="skeleton"></div></div></section>
+        <section id="settings-panel" class="admin-panel" aria-labelledby="settings-title">
+          <div class="section-title"><div><span class="eyebrow">Configuração</span><h2 id="settings-title">Definições</h2></div></div>
+          <article class="card settings-card"><h3>Dados do site</h3><form id="site-settings-form" class="form-grid"><label>WhatsApp<input name="whatsapp"></label><label>Telefone<input name="telefone"></label><label>Email<input name="email" type="email"></label><label>Instagram<input name="instagram" type="url"></label><label>Facebook<input name="facebook" type="url"></label><label>Intervalo rotativo (ms)<input name="intervaloMs" type="number" min="1000" step="500"></label><label class="wide-field">Mensagens do hero (uma por linha)<textarea name="mensagensHero" rows="4"></textarea></label><label class="wide-field">Mensagens da barra (uma por linha)<textarea name="mensagensBarra" rows="4"></textarea></label><button class="btn btn-primary" type="submit">Guardar definições</button></form></article>
+          <article class="card settings-card"><h3>Notificações no telemóvel</h3><ol><li>Cria um bot no <a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer">@BotFather</a>.</li><li>Abre o bot e envia-lhe <code>/start</code>.</li><li>Guarda <code>TELEGRAM_BOT_TOKEN</code> e <code>TELEGRAM_CHAT_ID</code> como Secrets em <strong>Cloudflare Pages &gt; naweb &gt; Settings &gt; Variables and Secrets</strong>.</li></ol><p id="telegram-status" role="status">A verificar configuração…</p><button id="test-telegram" class="btn btn-secondary" type="button">Enviar notificação de teste</button></article>
+          <article class="card settings-card"><h3>Comandos personalizados do chatbot</h3><div id="chatbot-commands" class="command-list"></div><div class="admin-action-row"><button id="add-command" class="btn btn-secondary" type="button">Adicionar comando</button><button id="save-commands" class="btn btn-primary" type="button">Guardar comandos</button></div></article>
+          <article class="card settings-card"><h3>Dados iniciais</h3><p>Preenche planos, exemplos, perguntas frequentes e as definições predefinidas no Firestore.</p><button id="seed" class="btn btn-secondary" type="button">Carregar dados iniciais</button></article>
+          <article class="card settings-card"><h3>Notificações neste browser</h3><p>O browser só avisa enquanto o painel estiver aberto. As notificações do Telegram cobrem o resto.</p></article>
+        </section>
+      </div>
+    </section>
   </main>
+  <dialog id="order-detail" class="detail-dialog"><form method="dialog" class="dialog-close-form"><button class="text-button" aria-label="Fechar detalhes">Fechar ×</button></form><div id="order-detail-content"></div></dialog>
+  <dialog id="idle-warning" class="idle-dialog"><h2>A sessão vai terminar</h2><p>A sessão terminará por inatividade dentro de um minuto.</p><div class="admin-action-row"><button id="stay-signed-in" class="btn btn-primary" type="button">Continuar ligado</button><button id="idle-logout" class="btn btn-secondary" type="button">Terminar sessão</button></div></dialog>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script type="module" src="js/admin.js"></script>
 </body>

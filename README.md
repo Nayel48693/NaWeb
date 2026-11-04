@@ -18,6 +18,16 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 8. Revê `privacidade.html`: é um modelo e precisa da identificação do responsável, prazos e detalhes legais reais.
 9. As oito demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma, Pulse Fit e Doce Mimo. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
 
+## Área administrativa
+
+O painel `admin.html` usa Firebase Authentication e o documento `admins/{UID}` para validar administradores. O login permite escolher entre persistência local e de sessão, recuperar a palavra-passe e termina automaticamente após 30 minutos de inatividade. A proteção contra tentativas repetidas no browser é apenas uma salvaguarda de interface; mantém também as proteções do Firebase Authentication.
+
+O Resumo mostra pedidos, conversão, receita recorrente, alertas e visitas recentes. Em Pedidos podes filtrar, usar lista/quadro, abrir detalhes, guardar notas e seguimentos, converter em cliente e exportar CSV. Clientes permite registar pagamentos e mensalidades. Visitantes agrega sessões por dia, dispositivo e demo, com vistas diárias, semanais, mensais e anuais; não recolhe IP nem dados pessoais. Definições gere os contactos e mensagens do site, os comandos do chatbot, notificações e os dados iniciais.
+
+As novas métricas são guardadas em `estatisticas_diarias/{AAAA-MM-DD}` no fuso `Europe/Lisbon`; a coleção anterior `estatisticas/visitas` continua a fornecer o total histórico. Os documentos diários contêm contagens agregadas de sessões, dispositivos e visualizações das oito demos. Os clientes são guardados em `clientes/{id}` e só os administradores podem ler ou alterar esses documentos. Depois de alterar `firestore.rules`, publica as regras em **Firebase Console > Firestore Database > Rules**.
+
+Para notificações Telegram, cria um bot com o [@BotFather](https://t.me/BotFather), envia `/start` ao bot e configura `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` como Secrets em **Cloudflare Pages > naweb > Settings > Variables and Secrets**. A Function envia apenas nome, plano e tipo de negócio; o teste não envia dados de clientes. A limitação de cinco pedidos por IP em dez minutos na Function é em memória e pode variar entre instâncias; para produção, recomenda-se configurar também uma regra de rate limiting no Cloudflare WAF para `POST /api/notificar` (por exemplo, 5 pedidos por IP em 10 minutos).
+
 ## Publicar no GitHub Pages
 
 Faz push deste conteúdo para um repositório GitHub e ativa Pages em **Settings > Pages**, escolhendo a branch e a pasta publicadas. Mantém os caminhos relativos para funcionar em subpastas.
@@ -37,7 +47,12 @@ Para testar localmente as Pages Functions, cria um ficheiro `.dev.vars` na raiz 
 - [ ] Escolha de plano a pré-selecionar o formulário.
 - [ ] Submissão do pedido: confirmar gravação no Firestore e visibilidade no admin; testar também o erro se o Firestore estiver indisponível.
 - [ ] Login no admin e verificação de permissões.
-- [ ] Alteração de estado e nota interna de um pedido.
+- [ ] Login admin: persistência local/de sessão, recuperação de palavra-passe, bloqueio após cinco tentativas, tema e logout por inatividade.
+- [ ] Pedidos: filtros, lista/quadro, detalhe, estado, histórico de notas, seguimento, conversão em cliente, eliminação e exportação CSV.
+- [ ] Clientes: pagamentos, valores por receber, mensalidades e alerta de cobrança nos próximos sete dias.
+- [ ] Visitantes: contagem por sessão em `estatisticas_diarias`, atualização em tempo real, vistas por dia/semana/mês/ano, demos e exportação CSV.
+- [ ] Notificações admin: pedido novo no browser sem duplicados, estado de permissão e teste do Telegram com os Secrets configurados.
+- [ ] Definições: guardar contactos/mensagens do site e comandos personalizados do chatbot.
 - [ ] Edição de planos e carregamento dos dados iniciais.
 - [ ] As oito demos em mobile, com imagens ou fallback ilustrado.
 - [ ] Em cada demo, abrir notificações e promoções, fechar com clique fora, Escape e novo clique; marcar notificações como lidas e testar o toast de promoção.

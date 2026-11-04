@@ -236,6 +236,38 @@ function setupPetShop() {
   updateCart();
 }
 
+async function trackDemoView() {
+  const demo = document.body.dataset.demo;
+  const knownDemos = ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria"];
+  if (!knownDemos.includes(demo)) return;
+  try {
+    const { db, doc, setDoc, increment } = await import("./firebase.js");
+    if (!db) return;
+    const visitKey = "nawebVisitCounted";
+    const demoKey = `nawebDemoCounted_${demo}`;
+    const isNewVisit = !sessionStorage.getItem(visitKey);
+    const isNewDemoView = !sessionStorage.getItem(demoKey);
+    if (!isNewVisit && !isNewDemoView) return;
+    if (isNewVisit) sessionStorage.setItem(visitKey, "1");
+    if (isNewDemoView) sessionStorage.setItem(demoKey, "1");
+
+    const dia = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Lisbon" });
+    const statsRef = doc(db, "estatisticas_diarias", dia);
+    const device = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768 ? "mobile" : "desktop";
+    if (isNewVisit) {
+      await setDoc(statsRef, {
+        dia,
+        visitas: increment(1),
+        [device]: increment(1)
+      }, { merge: true });
+    }
+    if (isNewDemoView) await setDoc(statsRef, { dia, [`demo_${demo}`]: increment(1) }, { merge: true });
+    if (isNewVisit) {
+      await setDoc(doc(db, "estatisticas", "visitas"), { total: increment(1) }, { merge: true });
+    }
+  } catch (_) {}
+}
+
 document.querySelectorAll("[data-step-next]").forEach((button) => button.addEventListener("click", () => {
   const current = button.closest("[data-step]");
   current.hidden = true;
@@ -247,5 +279,6 @@ fallbackImages();
 setupForms();
 setupFilters();
 setupPetShop();
+trackDemoView();
 
 export { DEMO_DATA };
