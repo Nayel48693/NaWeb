@@ -27,6 +27,10 @@ const DEMO_DATA = {
     notifications: [["🎂", "Encomenda pronta", "O teu bolo está pronto para levantar.", "há 5 min"], ["🍓", "Novo sabor da semana", "Descobre o nosso bolo de framboesa.", "há 1 h"], ["🕒", "Horário de fim de semana", "Estamos abertos no sábado até às 18:00.", "ontem"]],
     promotions: [["Caixa de macarons", "Uma seleção de seis sabores para partilhar.", "-10%", "MIMO10", "Até domingo"], ["Bolo de chocolate", "Um mimo doce para a tua próxima ocasião.", "-5€", "DOCE5", "Até ao fim do mês"], ["Croissant de amêndoa", "Acompanha o café com um toque especial.", "2 por 1", "AMENDOA", "Esta semana"]]
   },
+  floricultura: {
+    notifications: [["💐", "Encomenda pronta", "O teu ramo de peónias e rosas está pronto para levantar.", "há 5 min"], ["🌷", "Chegaram tulipas", "Novas tulipas frescas desta semana.", "há 1 h"], ["🕒", "Horário de fim de semana", "Estamos abertos no sábado até às 19:00.", "ontem"]],
+    promotions: [["Ramo de rosas", "Um gesto simples que diz muito.", "-10%", "ROSAS10", "Até domingo"], ["Ramos de tulipas", "Cor e alegria para oferecer nesta estação.", "-5€", "TULIPA5", "Até ao fim do mês"], ["Decoração de casamento", "Flores feitas à medida para o teu dia especial.", "-5€", "CASAMENTO5", "Para novos clientes"]]
+  },
   ginasio: {
     notifications: [["🚴", "Aula com vagas", "Aula de Spinning às 18:30 com vagas.", "há 5 min"], ["🏋️", "Novo horário", "Consulta o horário atualizado de aulas.", "há 1 h"], ["💪", "Treino da semana", "Experimenta uma aula de HIIT esta semana.", "ontem"]],
     promotions: [["Primeiro mês", "Começa a treinar com acompanhamento.", "-50%", "PULSE50", "Novas inscrições"], ["Plano anual", "Compromisso com a tua rotina.", "-15%", "ANUAL15", "Até ao fim do mês"], ["Aula experimental", "Vem conhecer o espaço sem compromisso.", "Grátis", "TESTE", "Mediante marcação"]]
@@ -88,7 +92,7 @@ function notificationsAndPromotions() {
   nav.append(actions);
   const panel = document.createElement("div");
   panel.className = "demo-panels";
-  panel.innerHTML = `<section id="demo-notifications" class="demo-panel" role="dialog" aria-label="Notificações" hidden><h2>Notificações</h2><div class="demo-notification-list">${data.notifications.map(([icon, title, text, time]) => `<button class="demo-notification" type="button"><span class="demo-notification-icon" aria-hidden="true">${icon}</span><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(text)}</small><time>${escapeHtml(time)}</time></span></button>`).join("")}</div><p class="demo-panel-foot">Exemplos fictícios para demonstração</p></section><section id="demo-promotions" class="demo-panel" role="dialog" aria-label="Promoções" hidden><h2>Promoções</h2><div class="demo-promotion-list">${data.promotions.map(([title, text, discount, code, expiry]) => `<article class="demo-promotion"><span class="demo-discount">${escapeHtml(discount)}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p><code>${escapeHtml(code)}</code><small>Válido: ${escapeHtml(expiry)}</small><button class="btn btn-primary btn-small" type="button" data-use-promo>Usar promoção</button></div></article>`).join("")}</div><p class="demo-panel-foot">Exemplos fictícios para demonstração</p></section>`;
+  panel.innerHTML = `<section id="demo-notifications" class="demo-panel" role="dialog" aria-label="Notificações" hidden><header class="demo-panel-head"><h2>Notificações</h2><button class="demo-panel-close" type="button" aria-label="Fechar notificações" data-close-panel><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg></button></header><div class="demo-panel-body"><div class="demo-notification-list">${data.notifications.map(([icon, title, text, time]) => `<button class="demo-notification" type="button"><span class="demo-notification-icon" aria-hidden="true">${icon}</span><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(text)}</small><time>${escapeHtml(time)}</time></span></button>`).join("")}</div></div><footer class="demo-panel-foot demo-panel-foot-actions"><span>Exemplos fictícios para demonstração</span><button class="demo-mark-read" type="button">Marcar todas como lidas</button></footer></section><section id="demo-promotions" class="demo-panel" role="dialog" aria-label="Promoções" hidden><header class="demo-panel-head"><h2>Promoções</h2><button class="demo-panel-close" type="button" aria-label="Fechar promoções" data-close-panel><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg></button></header><div class="demo-panel-body"><div class="demo-promotion-list">${data.promotions.map(([title, text, discount, code, expiry]) => `<article class="demo-promotion"><span class="demo-discount">${escapeHtml(discount)}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p><code>${escapeHtml(code)}</code><small>Válido: ${escapeHtml(expiry)}</small><button class="btn btn-primary btn-small" type="button" data-use-promo>Usar promoção</button></div></article>`).join("")}</div></div><footer class="demo-panel-foot">Exemplos fictícios para demonstração</footer></section>`;
   nav.append(panel);
   const toast = document.createElement("div");
   toast.className = "demo-toast";
@@ -102,9 +106,11 @@ function notificationsAndPromotions() {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 3000);
   };
-  const closePanels = () => {
+  let lastTrigger = null;
+  const closePanels = (restoreFocus = false) => {
     panel.querySelectorAll(".demo-panel").forEach((item) => { item.hidden = true; });
     actions.querySelectorAll("[data-panel-toggle]").forEach((button) => button.setAttribute("aria-expanded", "false"));
+    if (restoreFocus && lastTrigger) lastTrigger.focus({ preventScroll: true });
   };
   actions.addEventListener("click", (event) => {
     const button = event.target.closest("[data-panel-toggle]");
@@ -113,8 +119,10 @@ function notificationsAndPromotions() {
     const shouldOpen = target.hidden;
     closePanels();
     if (shouldOpen) {
+      lastTrigger = button;
       target.hidden = false;
       button.setAttribute("aria-expanded", "true");
+      target.querySelector("[data-close-panel]")?.focus({ preventScroll: true });
       if (button.dataset.panelToggle === "notifications") {
         actions.querySelector(".demo-badge")?.remove();
         button.setAttribute("aria-label", "Notificações");
@@ -122,8 +130,18 @@ function notificationsAndPromotions() {
     }
   });
   document.addEventListener("click", (event) => { if (!nav.contains(event.target)) closePanels(); });
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape") closePanels(); });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && [...panel.querySelectorAll(".demo-panel")].some((item) => !item.hidden)) closePanels(true);
+  });
   panel.addEventListener("click", (event) => {
+    if (event.target.closest("[data-close-panel]")) {
+      closePanels(true);
+      return;
+    }
+    if (event.target.closest(".demo-mark-read")) {
+      panel.querySelectorAll(".demo-notification").forEach((item) => item.classList.add("is-read"));
+      return;
+    }
     const notification = event.target.closest(".demo-notification");
     if (notification) notification.classList.add("is-read");
     if (event.target.closest("[data-use-promo]")) showToast();
@@ -238,7 +256,7 @@ function setupPetShop() {
 
 async function trackDemoView() {
   const demo = document.body.dataset.demo;
-  const knownDemos = ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria"];
+  const knownDemos = ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria", "floricultura"];
   if (!knownDemos.includes(demo)) return;
   try {
     const { db, doc, setDoc, increment } = await import("./firebase.js");

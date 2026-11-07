@@ -16,7 +16,7 @@ Como são usados ES modules e imports CDN, abre o projeto através de um servido
 6. Entra em `admin.html` e usa **Carregar dados iniciais** para preencher planos, exemplos, FAQ e `configuracoes/site`.
 7. O domínio público é `https://nawebs.com/`; confirma que canonical, `robots.txt` e `sitemap.xml` correspondem ao domínio publicado.
 8. Revê `privacidade.html`: é um modelo e precisa da identificação do responsável, prazos e detalhes legais reais.
-9. As oito demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma, Pulse Fit e Doce Mimo. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
+9. As nove demos são fictícias: barbearia, restaurante, salão, dentista, Pet Amigo, Café Aroma, Pulse Fit, Doce Mimo e Flor & Folha. Substitui imagens, endereço e mapas por conteúdos reais quando existirem.
 
 ## Área administrativa
 
@@ -24,7 +24,7 @@ O painel `admin.html` usa Firebase Authentication e o documento `admins/{UID}` p
 
 O Resumo mostra pedidos, conversão, receita recorrente, alertas e visitas recentes. Em Pedidos podes filtrar, usar lista/quadro, abrir detalhes, guardar notas e seguimentos, converter em cliente e exportar CSV. Clientes permite registar pagamentos e mensalidades. Visitantes agrega sessões por dia, dispositivo e demo, com vistas diárias, semanais, mensais e anuais; não recolhe IP nem dados pessoais. Definições gere os contactos e mensagens do site, os comandos do chatbot, notificações e os dados iniciais.
 
-As novas métricas são guardadas em `estatisticas_diarias/{AAAA-MM-DD}` no fuso `Europe/Lisbon`; a coleção anterior `estatisticas/visitas` continua a fornecer o total histórico. Os documentos diários contêm contagens agregadas de sessões, dispositivos e visualizações das oito demos. Os clientes são guardados em `clientes/{id}` e só os administradores podem ler ou alterar esses documentos. Depois de alterar `firestore.rules`, publica as regras em **Firebase Console > Firestore Database > Rules**.
+As novas métricas são guardadas em `estatisticas_diarias/{AAAA-MM-DD}` no fuso `Europe/Lisbon`; a coleção anterior `estatisticas/visitas` continua a fornecer o total histórico. Os documentos diários contêm contagens agregadas de sessões, dispositivos e visualizações das nove demos. Os clientes são guardados em `clientes/{id}` e só os administradores podem ler ou alterar esses documentos. Depois de alterar `firestore.rules`, publica as regras em **Firebase Console > Firestore Database > Rules**.
 
 Para notificações Telegram, cria um bot com o [@BotFather](https://t.me/BotFather), envia `/start` ao bot e configura `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` como Secrets em **Cloudflare Pages > naweb > Settings > Variables and Secrets**. A Function envia apenas nome, plano e tipo de negócio; o teste não envia dados de clientes. A limitação de cinco pedidos por IP em dez minutos na Function é em memória e pode variar entre instâncias; para produção, recomenda-se configurar também uma regra de rate limiting no Cloudflare WAF para `POST /api/notificar` (por exemplo, 5 pedidos por IP em 10 minutos).
 
@@ -43,7 +43,7 @@ Para testar localmente as Pages Functions, cria um ficheiro `.dev.vars` na raiz 
 ## Checklist de testes
 
 - [ ] Rotador do hero e da barra, incluindo pausa e `prefers-reduced-motion`.
-- [ ] Filtros de exemplos sem recarregar a página, incluindo as oito categorias.
+- [ ] Filtros de exemplos sem recarregar a página, incluindo as nove categorias.
 - [ ] Escolha de plano a pré-selecionar o formulário.
 - [ ] Submissão do pedido: confirmar gravação no Firestore e visibilidade no admin; testar também o erro se o Firestore estiver indisponível.
 - [ ] Login no admin e verificação de permissões.
@@ -54,11 +54,12 @@ Para testar localmente as Pages Functions, cria um ficheiro `.dev.vars` na raiz 
 - [ ] Notificações admin: pedido novo no browser sem duplicados, estado de permissão e teste do Telegram com os Secrets configurados.
 - [ ] Definições: guardar contactos/mensagens do site e comandos personalizados do chatbot.
 - [ ] Edição de planos e carregamento dos dados iniciais.
-- [ ] As oito demos em mobile, com imagens ou fallback ilustrado.
+- [ ] As nove demos em mobile, com imagens ou fallback ilustrado.
 - [ ] Em cada demo, abrir notificações e promoções, fechar com clique fora, Escape e novo clique; marcar notificações como lidas e testar o toast de promoção.
 - [ ] Demos Pet Amigo: filtros, detalhes, adicionar ao carrinho, quantidades, remoção e simulação de levantamento.
 - [ ] Demos Café Aroma e Pulse Fit: filtros de menu/horários e submissão dos formulários simulados.
 - [ ] Demo Doce Mimo: filtros de menu, notificações, promoções e encomenda simulada.
+- [ ] Demo Flor & Folha: filtros do catálogo, notificações, promoções e encomenda simulada.
 - [ ] Demo Clínica Sorriso Claro: FAQ, serviços e pedido de marcação simulado.
 - [ ] Links de contacto, cookies essenciais e barra inferior.
 - [ ] Chatbot: testar respostas por regras, respostas de Gemini em `https://nawebs.pages.dev`, fallback sem chave/com erro e limites de mensagens; confirmar que o histórico não persiste e que as mensagens são enviadas apenas à Pages Function.

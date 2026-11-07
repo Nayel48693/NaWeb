@@ -17,9 +17,9 @@ async function loadRemote() {
     if (plans.length) state.planos = plans.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
   } catch (_) {}
   try {
-    const examples = (await getDocs(collection(db, "exemplos"))).docs.map((item) => ({ id: item.id, ...item.data() })).filter((item) => typeof item.titulo === "string" && item.titulo.trim() && ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria"].includes(item.categoria) && typeof item.demoUrl === "string" && item.demoUrl.trim());
+    const examples = (await getDocs(collection(db, "exemplos"))).docs.map((item) => ({ id: item.id, ...item.data() })).filter((item) => typeof item.titulo === "string" && item.titulo.trim() && ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria", "floricultura"].includes(item.categoria) && typeof item.demoUrl === "string" && item.demoUrl.trim());
     if (examples.length) {
-      const additions = defaults.exemplos.filter((item) => ["dentista", "pet", "cafe", "ginasio", "confeitaria"].includes(item.id) && !examples.some((remote) => remote.id === item.id));
+      const additions = defaults.exemplos.filter((item) => ["dentista", "pet", "cafe", "ginasio", "confeitaria", "floricultura"].includes(item.id) && !examples.some((remote) => remote.id === item.id));
       state.exemplos = [...examples, ...additions].sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
     }
   } catch (_) {}

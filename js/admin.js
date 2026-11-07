@@ -9,12 +9,12 @@ import {
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const DAY_MS = 86400000;
-const DEMOS = ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria"];
+const DEMOS = ["barbearia", "restaurante", "salao", "dentista", "pet", "cafe", "ginasio", "confeitaria", "floricultura"];
 const STATES = ["novo", "contactado", "fechado", "perdido"];
 const state = {
   orders: [], clients: [], visits: [], plans: [], settings: { ...defaults.configuracoes },
-  charts: {}, unsubscribers: [], orderIdsSeen: new Set(), ordersLoaded: false,
-  ordersView: "list", visitorView: "day", currentOrder: null, legacyVisits: 0,
+  charts: {}, unsubscribers: [], orderIdsSeen: new Set(), ordersLoaded: false, ordersSignature: null,
+  ordersView: "list", visitorView: "day", visitorRowsLimit: 7, currentOrder: null, legacyVisits: 0,
   selectedYear: new Date().getFullYear(), selectedMonth: "todos", loginFailures: 0,
   lockTimer: null, idleTimer: null, warningTimer: null, warningCountdown: null,
   signedOutByUser: false
@@ -51,12 +51,12 @@ const setLoading = (selector, loading) => {
 
 function setTheme(theme) {
   document.body.dataset.theme = theme;
-  try { localStorage.setItem("nawebAdminTheme", theme); } catch (_) {}
+  try { localStorage.setItem("AnilanderTheme", theme); } catch (_) {}
 }
 
 function setupTheme() {
   let saved;
-  try { saved = localStorage.getItem("nawebAdminTheme"); } catch (_) {}
+  try { saved = localStorage.getItem("AnilanderTheme"); } catch (_) {}
   setTheme(saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
   $("#theme-toggle").addEventListener("click", () => setTheme(document.body.dataset.theme === "dark" ? "light" : "dark"));
 }
@@ -70,8 +70,7 @@ function showLogin(message = "") {
 function showApp(user) {
   $("#login").hidden = true;
   $("#app").hidden = false;
-  const firstName = user.displayName?.trim().split(/\s+/)[0] || user.email?.split("@")[0] || "bem-vindo";
-  $("#greeting").textContent = `Olá, ${firstName}`;
+  $("#greeting").textContent = "Olá, Anilander";
   $("#admin-date").textContent = new Intl.DateTimeFormat("pt-PT", { dateStyle: "full", timeZone: "Europe/Lisbon" }).format(new Date());
 }
 
@@ -84,6 +83,7 @@ function cleanupListeners() {
   state.clients = [];
   state.visits = [];
   state.ordersLoaded = false;
+  state.ordersSignature = null;
   state.orderIdsSeen.clear();
   clearTimeout(state.idleTimer);
   clearTimeout(state.warningTimer);
@@ -313,11 +313,15 @@ function renderOrders() {
   const orders = filteredOrders();
   const root = $("#orders");
   if (state.ordersView === "board") {
+    const scrollLeft = root.scrollLeft;
+    const columnScrollTops = $$(".board-column", root).map((column) => column.scrollTop);
     root.className = "admin-board";
     root.innerHTML = STATES.map((orderState) => {
       const group = orders.filter((order) => (order.estado || "novo") === orderState);
       return `<section class="board-column"><h3>${orderState}<span>${group.length}</span></h3>${group.map((order) => renderOrderCard(order, true)).join("") || '<p class="form-note">Sem pedidos</p>'}</section>`;
     }).join("");
+    root.scrollLeft = scrollLeft;
+    $$(".board-column", root).forEach((column, index) => { column.scrollTop = columnScrollTops[index] || 0; });
   } else {
     root.className = "admin-list";
     root.innerHTML = orders.length ? orders.map((order) => renderOrderCard(order)).join("") : '<p class="empty-state card">Ainda não existem pedidos para estes filtros.</p>';
@@ -376,16 +380,20 @@ function loadOrders() {
   setLoading("#orders-loading", true);
   state.unsubscribers.push(onSnapshot(query(collection(db, "pedidos"), orderBy("criadoEm", "desc")), (snapshot) => {
     const incoming = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
-    if (state.ordersLoaded && window.Notification?.permission === "granted" && localStorage.getItem("nawebAdminNotifications") === "true") {
+    if (state.ordersLoaded && window.Notification?.permission === "granted" && localStorage.getItem("AnilanderNotifications") === "true") {
       incoming.filter((order) => !state.orderIdsSeen.has(order.id) && (order.estado || "novo") === "novo").forEach((order) => announceOrder(order));
     }
     state.orderIdsSeen = new Set(incoming.map((order) => order.id));
     state.ordersLoaded = true;
     state.orders = incoming.sort((a, b) => (getOrderDate(b)?.getTime() || 0) - (getOrderDate(a)?.getTime() || 0));
     setLoading("#orders-loading", false);
-    renderOrders();
-    renderSummary();
-    updateOrderTitleBadge();
+    const signature = JSON.stringify(state.orders.map((order) => [order.id, order.estado, order.notaInterna, order.mensagem]));
+    if (signature !== state.ordersSignature) {
+      state.ordersSignature = signature;
+      renderOrders();
+      renderSummary();
+      updateOrderTitleBadge();
+    }
   }, (error) => {
     setLoading("#orders-loading", false);
     $("#orders-error").textContent = error.code === "permission-denied"
@@ -461,10 +469,19 @@ function setupBrowserNotifications() {
 
 async function saveOrderStatus(orderId, status) {
   if (!STATES.includes(status)) return;
+  const order = state.orders.find((item) => item.id === orderId);
+  if (!order) return;
+  const previousStatus = order.estado;
+  order.estado = status;
+  renderOrders();
+  renderSummary();
   try {
     await updateDoc(doc(db, "pedidos", orderId), { estado: status });
     setStatus("Estado do pedido atualizado.");
   } catch (error) {
+    order.estado = previousStatus;
+    renderOrders();
+    renderSummary();
     setStatus("Não foi possível atualizar o estado do pedido.", true);
     console.error("saveOrderStatus:", error.code, error.message);
   }
@@ -737,9 +754,10 @@ function buildVisitorRows() {
     const start = month ? new Date(state.selectedYear, month - 1, 1, 12) : new Date(state.selectedYear, 0, 1, 12);
     const end = month ? new Date(state.selectedYear, month, 0, 12) : new Date(state.selectedYear, 11, 31, 12);
     const rows = [];
+    const today = dayKey();
     for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
       const key = dayKey(date);
-      rows.push({ dia: key, visitas: Number(visits.get(key)?.visitas) || 0, mobile: Number(visits.get(key)?.mobile) || 0, desktop: Number(visits.get(key)?.desktop) || 0 });
+      if (key <= today) rows.push({ dia: key, visitas: Number(visits.get(key)?.visitas) || 0, mobile: Number(visits.get(key)?.mobile) || 0, desktop: Number(visits.get(key)?.desktop) || 0 });
     }
     return rows.reverse();
   }
@@ -793,10 +811,11 @@ function visitorColumns(rows) {
 
 function renderVisitors() {
   renderVisitorMetrics();
-  const rows = buildVisitorRows();
-  const columns = visitorColumns(rows);
-  const total = rows.reduce((sum, row) => sum + (Number(row.visitas) || 0), 0);
-  const best = rows.reduce((value, row) => Math.max(value, Number(row.visitas) || 0), 0);
+  const allRows = buildVisitorRows();
+  const rows = state.visitorView === "day" ? allRows.slice(0, state.visitorRowsLimit) : allRows;
+  const columns = visitorColumns(allRows);
+  const total = allRows.reduce((sum, row) => sum + (Number(row.visitas) || 0), 0);
+  const best = allRows.reduce((value, row) => Math.max(value, Number(row.visitas) || 0), 0);
   const today = dayKey();
   const headers = columns.map(([label]) => `<th>${label}</th>`).join("");
   const body = rows.map((row, index) => {
@@ -805,10 +824,12 @@ function renderVisitors() {
     const cells = columns.map(([, value]) => `<td>${value(row, index)}</td>`).join("");
     return `<tr class="${isToday ? "is-today" : ""} ${isBest ? "is-best" : ""}">${cells}</tr>`;
   }).join("");
-  const totalCells = columns.map(([label], index) => `<td>${index === 0 ? "Total" : (label === "Visitas" ? total : "")}</td>`).join("");
+  const totalCells = columns.map(([label], index) => `<td>${index === 0 ? (state.visitorView === "day" ? "Total do período" : "Total") : (label === "Visitas" ? total : "")}</td>`).join("");
   $("#visitor-table").className = "visitor-table table-scroll";
   $("#visitor-table").innerHTML = `<table><thead><tr>${headers}</tr></thead><tbody>${body}</tbody><tfoot><tr>${totalCells}</tr></tfoot></table>`;
-  renderVisitorCharts(rows);
+  $("#visits-more").hidden = state.visitorView !== "day" || allRows.length <= state.visitorRowsLimit;
+  $("#visits-less").hidden = state.visitorView !== "day" || state.visitorRowsLimit <= 7;
+  renderVisitorCharts(allRows);
   renderDemoAnalytics();
 }
 
@@ -863,18 +884,22 @@ function exportVisitors() {
 }
 
 function setupVisitorControls() {
-  $("#visits-year").addEventListener("change", (event) => { state.selectedYear = Number(event.target.value); renderVisitors(); });
-  $("#visits-month").addEventListener("change", (event) => { state.selectedMonth = event.target.value; renderVisitors(); });
+  $("#visits-year").addEventListener("change", (event) => { state.selectedYear = Number(event.target.value); state.visitorRowsLimit = 7; renderVisitors(); });
+  $("#visits-month").addEventListener("change", (event) => { state.selectedMonth = event.target.value; state.visitorRowsLimit = 7; renderVisitors(); });
   $("#period-prev").addEventListener("click", () => shiftMonth(-1));
   $("#period-next").addEventListener("click", () => shiftMonth(1));
   $$("[data-visitor-view]").forEach((button) => button.addEventListener("click", () => {
     state.visitorView = button.dataset.visitorView;
+    state.visitorRowsLimit = 7;
     $$("[data-visitor-view]").forEach((item) => item.classList.toggle("is-active", item === button));
     renderVisitors();
   }));
+  $("#visits-more").addEventListener("click", () => { state.visitorRowsLimit += 7; renderVisitors(); });
+  $("#visits-less").addEventListener("click", () => { state.visitorRowsLimit = 7; renderVisitors(); });
 }
 
 function shiftMonth(offset) {
+  state.visitorRowsLimit = 7;
   const month = state.selectedMonth === "todos" ? new Date().getMonth() : Number(state.selectedMonth) - 1;
   const date = new Date(state.selectedYear, month + offset, 1);
   state.selectedYear = date.getFullYear();
@@ -1042,7 +1067,11 @@ $$("[data-go-tab]").forEach((button) => button.addEventListener("click", () => a
 $("#logout").addEventListener("click", () => logout(false));
 $("#export-orders").addEventListener("click", exportOrders);
 $("#export-visits").addEventListener("click", exportVisitors);
-$("#order-search").addEventListener("input", renderOrders);
+let orderSearchTimer;
+$("#order-search").addEventListener("input", () => {
+  clearTimeout(orderSearchTimer);
+  orderSearchTimer = setTimeout(renderOrders, 200);
+});
 ["order-status-filter", "order-plan-filter", "order-business-filter", "order-date-from", "order-date-to"].forEach((id) => $(`#${id}`).addEventListener("change", renderOrders));
 $$("[data-orders-view]").forEach((button) => button.addEventListener("click", () => {
   state.ordersView = button.dataset.ordersView;

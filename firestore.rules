@@ -11,7 +11,7 @@ service cloud.firestore {
       return [
         'dia', 'visitas', 'mobile', 'desktop', 'demo_barbearia',
         'demo_restaurante', 'demo_salao', 'demo_dentista', 'demo_pet',
-        'demo_cafe', 'demo_ginasio', 'demo_confeitaria'
+        'demo_cafe', 'demo_ginasio', 'demo_confeitaria', 'demo_floricultura'
       ];
     }
 
@@ -23,7 +23,8 @@ service cloud.firestore {
         && (!data.keys().hasAny(['demo_pet']) || data.demo_pet == 1)
         && (!data.keys().hasAny(['demo_cafe']) || data.demo_cafe == 1)
         && (!data.keys().hasAny(['demo_ginasio']) || data.demo_ginasio == 1)
-        && (!data.keys().hasAny(['demo_confeitaria']) || data.demo_confeitaria == 1);
+        && (!data.keys().hasAny(['demo_confeitaria']) || data.demo_confeitaria == 1)
+        && (!data.keys().hasAny(['demo_floricultura']) || data.demo_floricultura == 1);
     }
 
     function validDailyCreate(dia) {
@@ -38,7 +39,8 @@ service cloud.firestore {
           || (!data.keys().hasAny(['visitas', 'mobile', 'desktop'])
             && data.keys().hasAny([
               'demo_barbearia', 'demo_restaurante', 'demo_salao', 'demo_dentista',
-              'demo_pet', 'demo_cafe', 'demo_ginasio', 'demo_confeitaria'
+              'demo_pet', 'demo_cafe', 'demo_ginasio', 'demo_confeitaria',
+              'demo_floricultura'
             ])))
         && validInitialDemoCounters(data);
     }
@@ -54,7 +56,7 @@ service cloud.firestore {
         && changed.hasOnly([
           'visitas', 'mobile', 'desktop', 'demo_barbearia', 'demo_restaurante',
           'demo_salao', 'demo_dentista', 'demo_pet', 'demo_cafe',
-          'demo_ginasio', 'demo_confeitaria'
+          'demo_ginasio', 'demo_confeitaria', 'demo_floricultura'
         ])
         && changed.size() <= 2
         && (!changed.hasAny(['visitas']) || incrementedByOne('visitas'))
@@ -67,7 +69,8 @@ service cloud.firestore {
         && (!changed.hasAny(['demo_pet']) || incrementedByOne('demo_pet'))
         && (!changed.hasAny(['demo_cafe']) || incrementedByOne('demo_cafe'))
         && (!changed.hasAny(['demo_ginasio']) || incrementedByOne('demo_ginasio'))
-        && (!changed.hasAny(['demo_confeitaria']) || incrementedByOne('demo_confeitaria'));
+        && (!changed.hasAny(['demo_confeitaria']) || incrementedByOne('demo_confeitaria'))
+        && (!changed.hasAny(['demo_floricultura']) || incrementedByOne('demo_floricultura'));
     }
 
     match /pedidos/{pedidoId} {
